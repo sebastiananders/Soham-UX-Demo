@@ -178,7 +178,7 @@ export default function App() {
         <div className="mt-[120px] flex gap-3 z-10 w-full max-w-[820px] justify-center px-4 mb-20">
           
           {/* Card 1 */}
-          <div className="bg-white p-[27px] rounded-[14px] flex flex-col gap-[14px] w-[254px] shadow-[0px_1px_9px_0px_rgba(0,0,0,0.05)] hover:shadow-[0px_4px_16px_0px_rgba(0,0,0,0.10)] border border-neutral-200 shrink-0 cursor-pointer transition-shadow duration-150">
+          <div className="bg-white p-[27px] rounded-[14px] flex flex-col gap-[14px] w-[254px] shadow-[0px_1px_9px_0px_rgba(0,0,0,0.05)] hover:shadow-[0px_4px_16px_0px_rgba(0,0,0,0.10)] border border-neutral-100 shrink-0 cursor-pointer transition-shadow duration-150">
             <div className="flex items-center gap-3">
               <div className="w-[30px] h-[30px] flex items-center justify-center shrink-0 scale-125 origin-left">
                 <Group2 />
@@ -194,7 +194,7 @@ export default function App() {
           </div>
 
           {/* Card 2 */}
-          <div className="bg-white p-[27px] rounded-[14px] flex flex-col gap-[14px] w-[254px] shadow-[0px_1px_9px_0px_rgba(0,0,0,0.05)] hover:shadow-[0px_4px_16px_0px_rgba(0,0,0,0.10)] border border-neutral-200 shrink-0 cursor-pointer transition-shadow duration-150">
+          <div className="bg-white p-[27px] rounded-[14px] flex flex-col gap-[14px] w-[254px] shadow-[0px_1px_9px_0px_rgba(0,0,0,0.05)] hover:shadow-[0px_4px_16px_0px_rgba(0,0,0,0.10)] border border-neutral-100 shrink-0 cursor-pointer transition-shadow duration-150">
             <div className="flex items-center gap-3">
               <div className="w-[20px] h-[30px] flex items-center justify-center shrink-0 scale-[1.3] origin-left ml-1">
                 <Group8 />
@@ -210,7 +210,7 @@ export default function App() {
           </div>
 
           {/* Card 3 */}
-          <div className="bg-white p-[27px] rounded-[14px] flex flex-col gap-[14px] w-[254px] shadow-[0px_1px_9px_0px_rgba(0,0,0,0.05)] hover:shadow-[0px_4px_16px_0px_rgba(0,0,0,0.10)] border border-neutral-200 shrink-0 cursor-pointer transition-shadow duration-150">
+          <div className="bg-white p-[27px] rounded-[14px] flex flex-col gap-[14px] w-[254px] shadow-[0px_1px_9px_0px_rgba(0,0,0,0.05)] hover:shadow-[0px_4px_16px_0px_rgba(0,0,0,0.10)] border border-neutral-100 shrink-0 cursor-pointer transition-shadow duration-150">
             <div className="flex items-center gap-3">
               <div className="w-[30px] h-[30px] flex items-center justify-center shrink-0 scale-125 origin-left">
                 <Inside />
