@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Home, PieChart, Globe, Ticket, Bell, TrendingUp, AlertCircle, Plus, Mic, Paperclip, MoreHorizontal, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { Home, PieChart, Globe, Ticket, Bell, TrendingUp, AlertCircle, Plus, Mic, Paperclip, MoreHorizontal, ChevronLeft, ChevronRight, X, ArrowUp } from 'lucide-react';
 import imgLogo from "../imports/DeviceMacBookPro14/c4121c79ef3207dcf24c7435552bb7378ad17369.png";
 import imgProfile from "../imports/DeviceMacBookPro14/d48bb91af6b62d07c468e4d0ae99ca184be233a8.png";
 import { Group2, Group8, Inside, Illustration } from './components/FigmaIcons';
@@ -110,6 +110,7 @@ export default function App() {
 
           <div className="flex flex-col items-center gap-[18px] relative w-full">
             {/* Input Bar */}
+            <div className="flex items-center gap-3">
             <div className="w-[600px] h-[57px] bg-white rounded-[28.5px] shadow-[0px_2px_8px_0px_rgba(23,23,23,0.1)] flex items-center px-[20px] gap-3">
               <div className="w-6 h-6 rounded-full bg-neutral-100 flex items-center justify-center shrink-0">
                 <Plus className="w-3.5 h-3.5 text-neutral-500" />
@@ -145,6 +146,18 @@ export default function App() {
                 <Mic className="w-5 h-5 cursor-pointer hover:text-neutral-600 transition-colors" />
                 <Paperclip className="w-5 h-5 cursor-pointer hover:text-neutral-600 transition-colors" />
               </div>
+            </div>
+            <button
+              style={{
+                opacity: inputValue ? 1 : 0,
+                transform: inputValue ? 'scale(1)' : 'scale(0.7)',
+                pointerEvents: inputValue ? 'auto' : 'none',
+                transition: 'opacity 0.2s ease, transform 0.2s ease',
+              }}
+              className="w-[57px] h-[57px] rounded-full bg-[#FFF000] flex items-center justify-center shrink-0 hover:brightness-95"
+            >
+              <ArrowUp className="w-5 h-5 text-neutral-900 stroke-[2.5]" />
+            </button>
             </div>
 
             {/* Prompt Suggestions */}
