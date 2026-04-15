@@ -178,7 +178,7 @@ export default function App() {
                     overflow: 'hidden',
                     transition: 'max-width 0.35s ease, opacity 0.2s ease, padding 0.35s ease',
                   }}
-                  className="px-5 py-2 bg-neutral-50 border border-neutral-300 rounded-full text-sm text-neutral-700 hover:bg-neutral-100 shadow-[0px_2px_6px_0px_rgba(0,0,0,0.08)] whitespace-nowrap"
+                  className="px-5 py-2 bg-neutral-50 rounded-full text-sm font-normal text-neutral-700 hover:bg-white transition-colors whitespace-nowrap cursor-pointer"
                 >
                   {text}
                 </button>
