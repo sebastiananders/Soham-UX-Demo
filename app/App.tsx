@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Home, PieChart, Globe, Ticket, Bell, TrendingUp, AlertCircle, Plus, Mic, Paperclip, MoreHorizontal, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Home, PieChart, Globe, Ticket, Bell, TrendingUp, AlertCircle, Plus, Mic, Paperclip, MoreHorizontal, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import imgLogo from "../imports/DeviceMacBookPro14/c4121c79ef3207dcf24c7435552bb7378ad17369.png";
 import imgProfile from "../imports/DeviceMacBookPro14/d48bb91af6b62d07c468e4d0ae99ca184be233a8.png";
 import { Group2, Group8, Inside, Illustration } from './components/FigmaIcons';
@@ -8,6 +8,15 @@ export default function App() {
   const [collapsed, setCollapsed] = useState(false);
   const [inputFocused, setInputFocused] = useState(false);
   const [inputValue, setInputValue] = useState('');
+  const [hiddenPills, setHiddenPills] = useState<Set<number>>(new Set());
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handlePillClick = (text: string, index: number) => {
+    setInputValue(text);
+    setHiddenPills(prev => new Set(prev).add(index));
+    setInputFocused(true);
+    inputRef.current?.focus();
+  };
 
   return (
     <div className="flex min-h-screen bg-white font-sans text-neutral-900 overflow-x-hidden">
@@ -108,8 +117,12 @@ export default function App() {
               <div className="relative flex-1">
                 <input
                   type="text"
+                  ref={inputRef}
                   value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
+                  onChange={(e) => {
+                    setInputValue(e.target.value);
+                    if (e.target.value === '') setHiddenPills(new Set());
+                  }}
                   onFocus={() => setInputFocused(true)}
                   onBlur={() => setInputFocused(false)}
                   className="w-full bg-transparent border-none outline-none text-[16px] text-neutral-900"
@@ -121,6 +134,14 @@ export default function App() {
                 )}
               </div>
               <div className="flex items-center gap-3 text-neutral-400 shrink-0">
+                {inputValue && (
+                  <button
+                    onClick={() => { setInputValue(''); setHiddenPills(new Set()); inputRef.current?.focus(); }}
+                    className="text-neutral-400 hover:text-neutral-600 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
                 <Mic className="w-5 h-5 cursor-pointer hover:text-neutral-600 transition-colors" />
                 <Paperclip className="w-5 h-5 cursor-pointer hover:text-neutral-600 transition-colors" />
               </div>
@@ -128,15 +149,27 @@ export default function App() {
 
             {/* Prompt Suggestions */}
             <div className="flex flex-wrap items-center justify-center gap-2">
-              <button className="px-5 py-2 bg-neutral-50 border border-neutral-300 rounded-full text-sm text-neutral-700 hover:bg-neutral-100 transition-colors shadow-[0px_2px_6px_0px_rgba(0,0,0,0.08)]">
-                Create a new ticket category
-              </button>
-              <button className="px-5 py-2 bg-neutral-50 border border-neutral-300 rounded-full text-sm text-neutral-700 hover:bg-neutral-100 transition-colors shadow-[0px_2px_6px_0px_rgba(0,0,0,0.08)]">
-                List all VIP registrations
-              </button>
-              <button className="px-5 py-2 bg-neutral-50 border border-neutral-300 rounded-full text-sm text-neutral-700 hover:bg-neutral-100 transition-colors shadow-[0px_2px_6px_0px_rgba(0,0,0,0.08)]">
-                Add a section to event website
-              </button>
+              {[
+                'Create a new ticket category',
+                'List all VIP registrations',
+                'Add a section to event website',
+              ].map((text, i) => (
+                <button
+                  key={i}
+                  onClick={() => handlePillClick(text, i)}
+                  style={{
+                    maxWidth: hiddenPills.has(i) ? '0' : '320px',
+                    opacity: hiddenPills.has(i) ? 0 : 1,
+                    paddingLeft: hiddenPills.has(i) ? 0 : undefined,
+                    paddingRight: hiddenPills.has(i) ? 0 : undefined,
+                    overflow: 'hidden',
+                    transition: 'max-width 0.35s ease, opacity 0.2s ease, padding 0.35s ease',
+                  }}
+                  className="px-5 py-2 bg-neutral-50 border border-neutral-300 rounded-full text-sm text-neutral-700 hover:bg-neutral-100 shadow-[0px_2px_6px_0px_rgba(0,0,0,0.08)] whitespace-nowrap"
+                >
+                  {text}
+                </button>
+              ))}
             </div>
           </div>
         </div>
