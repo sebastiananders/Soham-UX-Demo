@@ -3,6 +3,7 @@ import { Home, PieChart, Globe, Ticket, Bell, TrendingUp, AlertCircle, Plus, Mic
 import imgLogo from "../imports/DeviceMacBookPro14/c4121c79ef3207dcf24c7435552bb7378ad17369.png";
 import imgProfile from "../imports/DeviceMacBookPro14/d48bb91af6b62d07c468e4d0ae99ca184be233a8.png";
 import { Group2, Group8, Inside, Illustration } from './components/FigmaIcons';
+import illustrationInput from './assets/illustration-input.svg';
 
 export default function App() {
   const [collapsed, setCollapsed] = useState(false);
@@ -92,7 +93,10 @@ export default function App() {
         <div className="w-full max-w-[820px] pt-[200px] flex flex-col items-center gap-[30px] z-10 relative">
           
           <div className="flex flex-col items-center gap-[12px] w-full">
-            <h1 className="font-serif text-[33px] text-neutral-900 text-center">Aloha, Jen</h1>
+            <div className="flex items-center justify-center gap-3">
+              <h1 className="font-serif text-[33px] text-neutral-900">Aloha, Jen</h1>
+              <img src={illustrationInput} alt="" className="pointer-events-none" style={{ width: '52px', height: '58px', transform: 'rotate(180deg)' }} />
+            </div>
             
             {/* Status indicators */}
             <div className="flex items-center justify-center gap-3 px-6 py-3">
