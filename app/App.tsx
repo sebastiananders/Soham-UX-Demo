@@ -6,7 +6,8 @@ import { Group2, Group8, Inside, Illustration } from './components/FigmaIcons';
 import illustrationInput from './assets/illustration-input.svg';
 
 export default function App() {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
+  const [pinned, setPinned] = useState(false);
   const [inputFocused, setInputFocused] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [hiddenPills, setHiddenPills] = useState<Set<number>>(new Set());
@@ -22,37 +23,34 @@ export default function App() {
   return (
     <div className="flex min-h-screen bg-white font-sans text-neutral-900 overflow-x-hidden">
       {/* Sidebar */}
-      <aside className={`${collapsed ? 'w-[64px]' : 'w-[200px]'} border-r border-neutral-200 flex flex-col items-center py-8 bg-white z-20 shrink-0 transition-all duration-200 overflow-visible relative`}>
-        <div className={`${collapsed ? 'opacity-0 h-0 mb-0' : 'opacity-100 h-[36px] mb-12'} w-[45px] transition-all duration-200 overflow-hidden shrink-0`}>
+      <aside
+        className={`${collapsed ? 'w-[64px]' : 'w-[200px]'} border-r border-neutral-200 flex flex-col items-center py-8 bg-white z-20 shrink-0 transition-all duration-200 overflow-visible relative`}
+        onMouseEnter={() => !pinned && setCollapsed(false)}
+        onMouseLeave={() => !pinned && setCollapsed(true)}
+      >
+        <div className="w-[45px] h-[36px] mb-12 shrink-0">
           <img src={imgLogo} alt="Logo" className="w-full h-full object-cover pointer-events-none" />
         </div>
 
         <nav className="flex flex-col w-full px-2 gap-2 flex-1">
-          <a href="#" className={`flex items-center ${collapsed ? 'justify-center' : 'gap-2'} p-3 bg-neutral-50 rounded-md w-full text-neutral-900 font-semibold text-sm`}>
+          <a href="#" className="flex items-center gap-2 px-3 py-3 bg-neutral-50 rounded-md w-full text-neutral-900 font-semibold text-sm">
             <Home className="w-4 h-4 text-neutral-400 shrink-0" />
-            {!collapsed && <span>Soham home</span>}
+            <span className={`whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>Soham home</span>
           </a>
-          <a href="#" className={`flex items-center ${collapsed ? 'justify-center' : 'gap-2'} p-3 rounded-md w-full text-neutral-700 text-sm hover:bg-neutral-50 transition-colors`}>
+          <a href="#" className="flex items-center gap-2 px-3 py-3 rounded-md w-full text-neutral-700 text-sm hover:bg-neutral-50 transition-colors">
             <PieChart className="w-4 h-4 text-neutral-400 shrink-0" />
-            {!collapsed && <span>Insights & reporting</span>}
+            <span className={`whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>Insights & reporting</span>
           </a>
-          <a href="#" className={`flex items-center ${collapsed ? 'justify-center' : 'gap-2'} p-3 rounded-md w-full text-neutral-700 text-sm hover:bg-neutral-50 transition-colors`}>
+          <a href="#" className="flex items-center gap-2 px-3 py-3 rounded-md w-full text-neutral-700 text-sm hover:bg-neutral-50 transition-colors">
             <Globe className="w-4 h-4 text-neutral-400 shrink-0" />
-            {!collapsed && <span>Event website</span>}
+            <span className={`whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>Event website</span>
           </a>
-          <a href="#" className={`flex items-center ${collapsed ? 'justify-center' : 'gap-2'} p-3 rounded-md w-full text-neutral-700 text-sm hover:bg-neutral-50 transition-colors`}>
+          <a href="#" className="flex items-center gap-2 px-3 py-3 rounded-md w-full text-neutral-700 text-sm hover:bg-neutral-50 transition-colors">
             <Ticket className="w-4 h-4 text-neutral-400 shrink-0" />
-            {!collapsed && <span>Contact & tickets</span>}
+            <span className={`whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>Contact & tickets</span>
           </a>
         </nav>
 
-        {/* Collapse toggle */}
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-30 w-5 h-5 rounded-full bg-white border border-neutral-200 shadow-sm hover:bg-neutral-50 flex items-center justify-center text-neutral-400 transition-colors"
-        >
-          {collapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
-        </button>
 
         <div className="mt-auto flex flex-col items-center gap-3">
           <div className="w-10 h-10 rounded-full overflow-hidden relative shadow-sm shrink-0">
