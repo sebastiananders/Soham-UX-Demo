@@ -6,6 +6,8 @@ import { Group2, Group8, Inside, Illustration } from './components/FigmaIcons';
 
 export default function App() {
   const [collapsed, setCollapsed] = useState(false);
+  const [inputFocused, setInputFocused] = useState(false);
+  const [inputValue, setInputValue] = useState('');
 
   return (
     <div className="flex min-h-screen bg-white font-sans text-neutral-900 overflow-x-hidden">
@@ -103,12 +105,21 @@ export default function App() {
               <div className="w-6 h-6 rounded-full bg-neutral-100 flex items-center justify-center shrink-0">
                 <Plus className="w-3.5 h-3.5 text-neutral-500" />
               </div>
-              <input 
-                type="text" 
-                placeholder="Generate a schedule analysis for Tech Summit Europe 2026"
-                className="flex-1 bg-transparent border-none outline-none text-[16px] text-neutral-400 placeholder:text-neutral-400"
-                readOnly
-              />
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onFocus={() => setInputFocused(true)}
+                  onBlur={() => setInputFocused(false)}
+                  className="w-full bg-transparent border-none outline-none text-[16px] text-neutral-900"
+                />
+                {!inputFocused && !inputValue && (
+                  <span className="absolute inset-0 flex items-center text-[16px] text-neutral-400 pointer-events-none">
+                    Generate a schedule analysis for Tech Summit Europe 2026
+                  </span>
+                )}
+              </div>
               <div className="flex items-center gap-3 text-neutral-400 shrink-0">
                 <Mic className="w-5 h-5 cursor-pointer hover:text-neutral-600 transition-colors" />
                 <Paperclip className="w-5 h-5 cursor-pointer hover:text-neutral-600 transition-colors" />

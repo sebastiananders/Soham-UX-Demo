@@ -16,5 +16,5 @@
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["main.tsx", "app", "imports"]
+  "include": ["vite-env.d.ts", "main.tsx", "app", "imports"]
 }

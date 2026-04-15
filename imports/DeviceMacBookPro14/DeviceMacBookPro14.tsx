@@ -59,7 +59,7 @@ function Line1() {
         <g id="line">
           <path d={svgPaths.pa52d300} fill="var(--fill-0, #C8BEFF)" id="Vector" />
           <foreignObject height="40.3828" width="40.5033" x="10.4774" y="2.421">
-            <div style={{ backdropFilter: "blur(4.22px)", clipPath: "url(#bgblur_0_1_358_clip_path)", height: "100%", width: "100%" }} xmlns="http://www.w3.org/1999/xhtml" />
+            <div style={{ backdropFilter: "blur(4.22px)", clipPath: "url(#bgblur_0_1_358_clip_path)", height: "100%", width: "100%" }} />
           </foreignObject>
           <g filter="url(#filter0_n_1_358)" id="Vector_2" data-figma-bg-blur-radius="8.44512">
             <path d={svgPaths.p1b547270} fill="var(--fill-0, #FFB4B4)" fillOpacity="0.48" />
