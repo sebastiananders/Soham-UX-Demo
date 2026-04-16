@@ -2,8 +2,11 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Home, PieChart, Globe, Ticket, Bell, TrendingUp, AlertCircle, Plus, Mic, Paperclip, MoreHorizontal, ChevronLeft, ChevronRight, X, ArrowUp, MessageSquare } from 'lucide-react';
 import imgLogo from "../imports/DeviceMacBookPro14/c4121c79ef3207dcf24c7435552bb7378ad17369.png";
 import imgProfile from "../imports/DeviceMacBookPro14/d48bb91af6b62d07c468e4d0ae99ca184be233a8.png";
-import { Group2, Group8, Inside, Illustration } from './components/FigmaIcons';
+import { Illustration } from './components/FigmaIcons';
 import illustrationInput from './assets/illustration-input.svg';
+import speakerIcon from './assets/speaker.svg';
+import warmContactsIcon from './assets/warmcontacts.svg';
+import regInsightIcon from './assets/reginsight.svg';
 
 const recentChats = [
   'Generate a schedule analysis…',
@@ -28,11 +31,11 @@ function SpeakerChatView({ onBack }: { onBack: () => void }) {
             <ChevronLeft className="w-4 h-4" />
           </button>
           <div className="w-[24px] h-[24px] flex items-center justify-center shrink-0 scale-110 origin-center">
-            <Group2 />
+            <img src={speakerIcon} className="w-full h-full object-contain" />
           </div>
           <div className="flex flex-col">
             <h2 className="font-semibold text-neutral-900 text-sm leading-tight">Speaker profiles</h2>
-            <span className="text-orange-500 font-semibold text-[11px]">Event website</span>
+            <span className="text-neutral-400 font-semibold text-[11px]">Event website</span>
           </div>
         </header>
 
@@ -41,8 +44,8 @@ function SpeakerChatView({ onBack }: { onBack: () => void }) {
 
           {/* Message 1 */}
           <div className="flex gap-3">
-            <div className="w-7 h-7 rounded-full bg-neutral-900 flex items-center justify-center shrink-0 mt-0.5">
-              <span className="text-white text-[11px] font-semibold">S</span>
+            <div className="w-7 h-7 rounded-full bg-white border border-neutral-200 flex items-center justify-center shrink-0 mt-0.5 overflow-hidden p-1">
+              <img src={imgLogo} alt="Soham" className="w-full h-full object-contain" />
             </div>
             <div className="flex flex-col gap-1">
               <div className="flex items-baseline gap-2">
@@ -57,8 +60,8 @@ function SpeakerChatView({ onBack }: { onBack: () => void }) {
 
           {/* Message 2 */}
           <div className="flex gap-3">
-            <div className="w-7 h-7 rounded-full bg-neutral-900 flex items-center justify-center shrink-0 mt-0.5">
-              <span className="text-white text-[11px] font-semibold">S</span>
+            <div className="w-7 h-7 rounded-full bg-white border border-neutral-200 flex items-center justify-center shrink-0 mt-0.5 overflow-hidden p-1">
+              <img src={imgLogo} alt="Soham" className="w-full h-full object-contain" />
             </div>
             <div className="flex flex-col gap-1">
               <div className="flex items-baseline gap-2">
@@ -73,8 +76,8 @@ function SpeakerChatView({ onBack }: { onBack: () => void }) {
 
           {/* Message 3 — awaiting approval */}
           <div className="flex gap-3">
-            <div className="w-7 h-7 rounded-full bg-neutral-900 flex items-center justify-center shrink-0 mt-0.5">
-              <span className="text-white text-[11px] font-semibold">S</span>
+            <div className="w-7 h-7 rounded-full bg-white border border-neutral-200 flex items-center justify-center shrink-0 mt-0.5 overflow-hidden p-1">
+              <img src={imgLogo} alt="Soham" className="w-full h-full object-contain" />
             </div>
             <div className="flex flex-col gap-3">
               <div className="flex items-baseline gap-2">
@@ -214,11 +217,11 @@ function WarmContactsChatView({ onBack }: { onBack: () => void }) {
             <ChevronLeft className="w-4 h-4" />
           </button>
           <div className="w-[20px] h-[30px] flex items-center justify-center shrink-0 scale-[1.2] origin-center">
-            <Group8 />
+            <img src={warmContactsIcon} className="w-full h-full object-contain" />
           </div>
           <div className="flex flex-col ml-1">
             <h2 className="font-semibold text-neutral-900 text-sm leading-tight">Win warm contacts</h2>
-            <span className="text-neutral-500 font-semibold text-[11px]">Contact & tickets</span>
+            <span className="text-neutral-400 font-semibold text-[11px]">Contact & tickets</span>
           </div>
         </header>
 
@@ -227,8 +230,8 @@ function WarmContactsChatView({ onBack }: { onBack: () => void }) {
 
           {/* Message 1 */}
           <div className="flex gap-3">
-            <div className="w-7 h-7 rounded-full bg-neutral-900 flex items-center justify-center shrink-0 mt-0.5">
-              <span className="text-white text-[11px] font-semibold">S</span>
+            <div className="w-7 h-7 rounded-full bg-white border border-neutral-200 flex items-center justify-center shrink-0 mt-0.5 overflow-hidden p-1">
+              <img src={imgLogo} alt="Soham" className="w-full h-full object-contain" />
             </div>
             <div className="flex flex-col gap-1">
               <div className="flex items-baseline gap-2">
@@ -243,8 +246,8 @@ function WarmContactsChatView({ onBack }: { onBack: () => void }) {
 
           {/* Message 2 */}
           <div className="flex gap-3">
-            <div className="w-7 h-7 rounded-full bg-neutral-900 flex items-center justify-center shrink-0 mt-0.5">
-              <span className="text-white text-[11px] font-semibold">S</span>
+            <div className="w-7 h-7 rounded-full bg-white border border-neutral-200 flex items-center justify-center shrink-0 mt-0.5 overflow-hidden p-1">
+              <img src={imgLogo} alt="Soham" className="w-full h-full object-contain" />
             </div>
             <div className="flex flex-col gap-1">
               <div className="flex items-baseline gap-2">
@@ -259,8 +262,8 @@ function WarmContactsChatView({ onBack }: { onBack: () => void }) {
 
           {/* Message 3 — action */}
           <div className="flex gap-3">
-            <div className="w-7 h-7 rounded-full bg-neutral-900 flex items-center justify-center shrink-0 mt-0.5">
-              <span className="text-white text-[11px] font-semibold">S</span>
+            <div className="w-7 h-7 rounded-full bg-white border border-neutral-200 flex items-center justify-center shrink-0 mt-0.5 overflow-hidden p-1">
+              <img src={imgLogo} alt="Soham" className="w-full h-full object-contain" />
             </div>
             <div className="flex flex-col gap-3">
               <div className="flex items-baseline gap-2">
@@ -409,19 +412,19 @@ function RegistrationInsightChatView({ onBack }: { onBack: () => void }) {
             <ChevronLeft className="w-4 h-4" />
           </button>
           <div className="w-[24px] h-[24px] flex items-center justify-center shrink-0 scale-110 origin-center">
-            <Inside />
+            <img src={regInsightIcon} className="w-full h-full object-contain" />
           </div>
           <div className="flex flex-col ml-0.5">
             <h2 className="font-semibold text-neutral-900 text-sm leading-tight">Registration insight</h2>
-            <span className="text-emerald-500 font-semibold text-[11px]">Insights & reporting</span>
+            <span className="text-neutral-400 font-semibold text-[11px]">Insights & reporting</span>
           </div>
         </header>
 
         <div className="flex-1 overflow-y-auto py-7 px-6 flex flex-col gap-7">
 
           <div className="flex gap-3">
-            <div className="w-7 h-7 rounded-full bg-neutral-900 flex items-center justify-center shrink-0 mt-0.5">
-              <span className="text-white text-[11px] font-semibold">S</span>
+            <div className="w-7 h-7 rounded-full bg-white border border-neutral-200 flex items-center justify-center shrink-0 mt-0.5 overflow-hidden p-1">
+              <img src={imgLogo} alt="Soham" className="w-full h-full object-contain" />
             </div>
             <div className="flex flex-col gap-1">
               <div className="flex items-baseline gap-2">
@@ -435,8 +438,8 @@ function RegistrationInsightChatView({ onBack }: { onBack: () => void }) {
           </div>
 
           <div className="flex gap-3">
-            <div className="w-7 h-7 rounded-full bg-neutral-900 flex items-center justify-center shrink-0 mt-0.5">
-              <span className="text-white text-[11px] font-semibold">S</span>
+            <div className="w-7 h-7 rounded-full bg-white border border-neutral-200 flex items-center justify-center shrink-0 mt-0.5 overflow-hidden p-1">
+              <img src={imgLogo} alt="Soham" className="w-full h-full object-contain" />
             </div>
             <div className="flex flex-col gap-1">
               <div className="flex items-baseline gap-2">
@@ -450,8 +453,8 @@ function RegistrationInsightChatView({ onBack }: { onBack: () => void }) {
           </div>
 
           <div className="flex gap-3">
-            <div className="w-7 h-7 rounded-full bg-neutral-900 flex items-center justify-center shrink-0 mt-0.5">
-              <span className="text-white text-[11px] font-semibold">S</span>
+            <div className="w-7 h-7 rounded-full bg-white border border-neutral-200 flex items-center justify-center shrink-0 mt-0.5 overflow-hidden p-1">
+              <img src={imgLogo} alt="Soham" className="w-full h-full object-contain" />
             </div>
             <div className="flex flex-col gap-3">
               <div className="flex items-baseline gap-2">
@@ -730,7 +733,6 @@ export default function App() {
               <div className="flex flex-col items-center gap-[12px] w-full">
                 <div className="flex items-center justify-center gap-3">
                   <h1 className="font-serif text-[33px] text-neutral-900">Aloha, Jen</h1>
-                  <img src={illustrationInput} alt="" className="pointer-events-none" style={{ width: '52px', height: '58px', transform: 'rotate(180deg)' }} />
                 </div>
 
                 {/* Status indicators */}
@@ -832,52 +834,55 @@ export default function App() {
               {/* Card 1 */}
               <div
                 onClick={() => setActiveCard(0)}
-                className="bg-white p-[27px] rounded-[14px] flex flex-col gap-[14px] w-[254px] shadow-[0px_1px_9px_0px_rgba(0,0,0,0.05)] hover:shadow-[0px_4px_16px_0px_rgba(0,0,0,0.10)] border border-neutral-100 shrink-0 cursor-pointer transition-shadow duration-150"
+                className="bg-white p-6 rounded-[0.85175rem] flex flex-col gap-2 w-[254px] shadow-[0_1.136px_9.085px_0_rgba(0,0,0,0.05)] hover:shadow-[0px_4px_16px_0px_rgba(0,0,0,0.10)] border-[1.136px] border-[#ECEAEA] shrink-0 cursor-pointer transition-shadow duration-150"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-[30px] h-[30px] flex items-center justify-center shrink-0 scale-125 origin-left">
-                    <Group2 />
+                  <div className="w-[25px] h-[25px] flex items-center justify-center shrink-0">
+                    <img src={speakerIcon} className="w-full h-full object-contain" />
                   </div>
-                  <div className="flex flex-col">
-                    <h3 className="font-semibold text-neutral-900 text-[16px] leading-tight">Speaker profiles</h3>
-                    <span className="text-orange-500 font-semibold text-[12px]">Event website</span>
-                  </div>
+                  <h3 className="font-semibold text-neutral-900 text-[15px] leading-tight">Speaker profiles</h3>
                 </div>
-                <p className="text-[12px] text-neutral-900 leading-[1.5]">
+                <p className="text-[12px] text-neutral-500 leading-[1.6] flex-1">
                   Your event page is missing a speaker. Soham has drafted bio content and a layout section ready for review
                 </p>
+                <div className="flex items-center gap-1.5 pt-1 border-t border-neutral-50">
+                  <Globe className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+                  <span className="text-[11px] text-neutral-400 font-medium">Event website agent</span>
+                </div>
               </div>
 
               {/* Card 2 */}
-              <div onClick={() => setActiveCard(1)} className="bg-white p-[27px] rounded-[14px] flex flex-col gap-[14px] w-[254px] shadow-[0px_1px_9px_0px_rgba(0,0,0,0.05)] hover:shadow-[0px_4px_16px_0px_rgba(0,0,0,0.10)] border border-neutral-100 shrink-0 cursor-pointer transition-shadow duration-150">
+              <div onClick={() => setActiveCard(1)} className="bg-white p-6 rounded-[0.85175rem] flex flex-col gap-2 w-[254px] shadow-[0_1.136px_9.085px_0_rgba(0,0,0,0.05)] hover:shadow-[0px_4px_16px_0px_rgba(0,0,0,0.10)] border-[1.136px] border-[#ECEAEA] shrink-0 cursor-pointer transition-shadow duration-150">
                 <div className="flex items-center gap-3">
-                  <div className="w-[20px] h-[30px] flex items-center justify-center shrink-0 scale-[1.3] origin-left ml-1">
-                    <Group8 />
+                  <div className="w-[25px] h-[25px] flex items-center justify-center shrink-0">
+                    <img src={warmContactsIcon} className="w-full h-full object-contain" />
                   </div>
-                  <div className="flex flex-col">
-                    <h3 className="font-semibold text-neutral-900 text-[16px] leading-tight">Win warm contacts</h3>
-                    <span className="text-neutral-500 font-bold text-[12px]">Contact & tickets</span>
-                  </div>
+                  <h3 className="font-semibold text-neutral-900 text-[15px] leading-tight">Win warm contacts</h3>
                 </div>
-                <p className="text-[12px] text-neutral-900 leading-[1.5]">
+                <p className="text-[12px] text-neutral-500 leading-[1.6] flex-1">
                   Draft a last-chance early-bird email to 340 warm contacts who opened the invite but haven't registered.
                 </p>
+                <div className="flex items-center gap-1.5 pt-1 border-t border-neutral-50">
+                  <Ticket className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+                  <span className="text-[11px] text-neutral-400 font-medium">Contact & tickets agent</span>
+                </div>
               </div>
 
               {/* Card 3 */}
-              <div onClick={() => setActiveCard(2)} className="bg-white p-[27px] rounded-[14px] flex flex-col gap-[14px] w-[254px] shadow-[0px_1px_9px_0px_rgba(0,0,0,0.05)] hover:shadow-[0px_4px_16px_0px_rgba(0,0,0,0.10)] border border-neutral-100 shrink-0 cursor-pointer transition-shadow duration-150">
+              <div onClick={() => setActiveCard(2)} className="bg-white p-6 rounded-[0.85175rem] flex flex-col gap-2 w-[254px] shadow-[0_1.136px_9.085px_0_rgba(0,0,0,0.05)] hover:shadow-[0px_4px_16px_0px_rgba(0,0,0,0.10)] border-[1.136px] border-[#ECEAEA] shrink-0 cursor-pointer transition-shadow duration-150">
                 <div className="flex items-center gap-3">
-                  <div className="w-[30px] h-[30px] flex items-center justify-center shrink-0 scale-125 origin-left">
-                    <Inside />
+                  <div className="w-[25px] h-[25px] flex items-center justify-center shrink-0">
+                    <img src={regInsightIcon} className="w-full h-full object-contain" />
                   </div>
-                  <div className="flex flex-col">
-                    <h3 className="font-semibold text-neutral-900 text-[16px] leading-tight">Registration insight</h3>
-                    <span className="text-emerald-500 font-bold text-[12px]">Insights & reporting</span>
-                  </div>
+                  <h3 className="font-semibold text-neutral-900 text-[15px] leading-tight">Registration insight</h3>
                 </div>
-                <p className="text-[12px] text-neutral-900 leading-[1.5]">
+                <p className="text-[12px] text-neutral-500 leading-[1.6] flex-1">
                   Gathered recent data about the 612 participants and a first insights into the revenue projection
                 </p>
+                <div className="flex items-center gap-1.5 pt-1 border-t border-neutral-50">
+                  <PieChart className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+                  <span className="text-[11px] text-neutral-400 font-medium">Insights & reporting agent</span>
+                </div>
               </div>
 
             </div>
