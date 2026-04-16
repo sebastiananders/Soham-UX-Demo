@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bizzabo B — Agent Working</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0a;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 60px;
+  }
+
+  .stage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 80px;
+    flex-wrap: wrap;
+  }
+
+  .demo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .demo-label {
+    font-family: system-ui, sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #444;
+  }
+
+  /* ═══════════════════════════════════════
+     VARIANT 1: CONTINUOUS DRAW LOOP
+     Single stroke that draws on, holds, then resets
+  ═══════════════════════════════════════ */
+
+  .v1 .b-stroke {
+    stroke-dasharray: 1200;
+    stroke-dashoffset: 1200;
+    animation: draw1 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+  .v1 .b-fill {
+    animation: fill1 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+
+  @keyframes draw1 {
+    0%   { stroke-dashoffset: 1200; }
+    60%  { stroke-dashoffset: 0; }
+    85%  { stroke-dashoffset: 0; }
+    100% { stroke-dashoffset: 0; }
+  }
+  @keyframes fill1 {
+    0%   { fill-opacity: 0; }
+    50%  { fill-opacity: 0; }
+    70%  { fill-opacity: 1; }
+    85%  { fill-opacity: 1; }
+    95%  { fill-opacity: 0; }
+    100% { fill-opacity: 0; }
+  }
+
+  /* ═══════════════════════════════════════
+     VARIANT 2: DRAW ON + FADE STROKE OUT
+     Stroke draws, fill appears, stroke fades — then repeats
+  ═══════════════════════════════════════ */
+
+  .v2 .b-stroke {
+    stroke-dasharray: 1200;
+    stroke-dashoffset: 1200;
+    animation: draw2 4s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
+  }
+  .v2 .b-fill {
+    animation: fill2 4s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
+  }
+  .v2 .b-stroke-fade {
+    stroke-dasharray: 0;
+    stroke-dashoffset: 0;
+    animation: strokeFade2 4s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
+  }
+
+  @keyframes draw2 {
+    0%   { stroke-dashoffset: 1200; }
+    45%  { stroke-dashoffset: 0; }
+    55%  { stroke-dashoffset: 0; }
+    100% { stroke-dashoffset: 0; }
+  }
+  @keyframes fill2 {
+    0%   { fill-opacity: 0; }
+    40%  { fill-opacity: 0; }
+    55%  { fill-opacity: 1; }
+    75%  { fill-opacity: 1; }
+    90%  { fill-opacity: 0; }
+    100% { fill-opacity: 0; }
+  }
+  @keyframes strokeFade2 {
+    0%   { stroke-opacity: 0; }
+    45%  { stroke-opacity: 0; }
+    55%  { stroke-opacity: 1; }
+    70%  { stroke-opacity: 0; }
+    100% { stroke-opacity: 0; }
+  }
+
+  /* ═══════════════════════════════════════
+     VARIANT 3: PERPETUAL — never fully completes
+     Draws on and erases from behind, always moving
+  ═══════════════════════════════════════ */
+
+  .v3 .b-stroke {
+    stroke-dasharray: 400 800;
+    animation: draw3 2.5s linear infinite;
+  }
+
+  @keyframes draw3 {
+    0%   { stroke-dashoffset: 1200; }
+    100% { stroke-dashoffset: 0; }
+  }
+
+  /* ═══════════════════════════════════════
+     VARIANT 4: SLOW MATERIALIZATION
+     Very slow draw, subtle glow, fills gently
+  ═══════════════════════════════════════ */
+
+  .v4 .b-stroke {
+    stroke-dasharray: 1200;
+    stroke-dashoffset: 1200;
+    animation: draw4 5s ease-in-out infinite;
+    filter: url(#glow);
+  }
+  .v4 .b-fill {
+    animation: fill4 5s ease-in-out infinite;
+  }
+
+  @keyframes draw4 {
+    0%   { stroke-dashoffset: 1200; stroke-opacity: 0.4; }
+    15%  { stroke-opacity: 1; }
+    55%  { stroke-dashoffset: 0; stroke-opacity: 1; }
+    70%  { stroke-dashoffset: 0; stroke-opacity: 0.3; }
+    85%  { stroke-dashoffset: 0; stroke-opacity: 0; }
+    100% { stroke-dashoffset: 1200; stroke-opacity: 0; }
+  }
+  @keyframes fill4 {
+    0%   { fill-opacity: 0; }
+    50%  { fill-opacity: 0; }
+    65%  { fill-opacity: 1; }
+    80%  { fill-opacity: 1; }
+    95%  { fill-opacity: 0; }
+    100% { fill-opacity: 0; }
+  }
+
+</style>
+</head>
+<body>
+
+<svg style="position:absolute;width:0;height:0;">
+  <defs>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+</svg>
+
+<div class="stage">
+
+  <!-- V1: Continuous Draw -->
+  <div class="demo">
+    <svg class="v1" width="80" height="80" viewBox="50 35 120 150" xmlns="http://www.w3.org/2000/svg">
+      <path class="b-fill" d="M150.2 104.8C154.8 99.5 157.4 93.3001 157.4 86.6001C157.4 61.7001 138.7 43.3 98.7 43.3C75.8 43.3 58.7 50.0001 58.7 50.0001L64.7 66.0001C64.7 66.0001 77 59.3 98.7 59.3C120.4 59.3 141.4 65.5001 141.4 86.6001C141.4 89.8001 140.6 92.4001 139.1 94.6001C122.8 82.1001 101.8 74.6001 85.4 74.6001C76.1 74.6001 62.1 79.3001 62.1 92.6001C62.1 113.9 94.8 119.9 112.1 119.9C121.8 119.9 130.5 117.8 137.7 114.3C144.3 121.5 148.8 130.3 148.8 140.6C148.8 156.4 132.1 159.9 122.8 159.9C97.5 159.9 82.8 142.8 78.1 132.6L62.8 136.6V172.6H78.8V159.3C78.8 159.3 94.9 176.6 122.8 176.6C149.5 176.6 165.5 160.9 165.5 140.6C165.4 127.1 159.4 114.9 150.2 104.8ZM78.8 94.0001C78.8 87.3001 103.7 90.6001 123.8 103.1C105.2 106.6 78.8 99.9001 78.8 94.0001Z" fill="#e0e0e0" fill-opacity="0"/>
+      <path class="b-stroke" d="M150.2 104.8C154.8 99.5 157.4 93.3001 157.4 86.6001C157.4 61.7001 138.7 43.3 98.7 43.3C75.8 43.3 58.7 50.0001 58.7 50.0001L64.7 66.0001C64.7 66.0001 77 59.3 98.7 59.3C120.4 59.3 141.4 65.5001 141.4 86.6001C141.4 89.8001 140.6 92.4001 139.1 94.6001C122.8 82.1001 101.8 74.6001 85.4 74.6001C76.1 74.6001 62.1 79.3001 62.1 92.6001C62.1 113.9 94.8 119.9 112.1 119.9C121.8 119.9 130.5 117.8 137.7 114.3C144.3 121.5 148.8 130.3 148.8 140.6C148.8 156.4 132.1 159.9 122.8 159.9C97.5 159.9 82.8 142.8 78.1 132.6L62.8 136.6V172.6H78.8V159.3C78.8 159.3 94.9 176.6 122.8 176.6C149.5 176.6 165.5 160.9 165.5 140.6C165.4 127.1 159.4 114.9 150.2 104.8ZM78.8 94.0001C78.8 87.3001 103.7 90.6001 123.8 103.1C105.2 106.6 78.8 99.9001 78.8 94.0001Z" fill="none" stroke="#e0e0e0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="demo-label">Draw + Fill</span>
+  </div>
+
+  <!-- V2: Draw + Fade Stroke -->
+  <div class="demo">
+    <svg class="v2" width="80" height="80" viewBox="50 35 120 150" xmlns="http://www.w3.org/2000/svg">
+      <path class="b-fill" d="M150.2 104.8C154.8 99.5 157.4 93.3001 157.4 86.6001C157.4 61.7001 138.7 43.3 98.7 43.3C75.8 43.3 58.7 50.0001 58.7 50.0001L64.7 66.0001C64.7 66.0001 77 59.3 98.7 59.3C120.4 59.3 141.4 65.5001 141.4 86.6001C141.4 89.8001 140.6 92.4001 139.1 94.6001C122.8 82.1001 101.8 74.6001 85.4 74.6001C76.1 74.6001 62.1 79.3001 62.1 92.6001C62.1 113.9 94.8 119.9 112.1 119.9C121.8 119.9 130.5 117.8 137.7 114.3C144.3 121.5 148.8 130.3 148.8 140.6C148.8 156.4 132.1 159.9 122.8 159.9C97.5 159.9 82.8 142.8 78.1 132.6L62.8 136.6V172.6H78.8V159.3C78.8 159.3 94.9 176.6 122.8 176.6C149.5 176.6 165.5 160.9 165.5 140.6C165.4 127.1 159.4 114.9 150.2 104.8ZM78.8 94.0001C78.8 87.3001 103.7 90.6001 123.8 103.1C105.2 106.6 78.8 99.9001 78.8 94.0001Z" fill="#e0e0e0" fill-opacity="0"/>
+      <path class="b-stroke" d="M150.2 104.8C154.8 99.5 157.4 93.3001 157.4 86.6001C157.4 61.7001 138.7 43.3 98.7 43.3C75.8 43.3 58.7 50.0001 58.7 50.0001L64.7 66.0001C64.7 66.0001 77 59.3 98.7 59.3C120.4 59.3 141.4 65.5001 141.4 86.6001C141.4 89.8001 140.6 92.4001 139.1 94.6001C122.8 82.1001 101.8 74.6001 85.4 74.6001C76.1 74.6001 62.1 79.3001 62.1 92.6001C62.1 113.9 94.8 119.9 112.1 119.9C121.8 119.9 130.5 117.8 137.7 114.3C144.3 121.5 148.8 130.3 148.8 140.6C148.8 156.4 132.1 159.9 122.8 159.9C97.5 159.9 82.8 142.8 78.1 132.6L62.8 136.6V172.6H78.8V159.3C78.8 159.3 94.9 176.6 122.8 176.6C149.5 176.6 165.5 160.9 165.5 140.6C165.4 127.1 159.4 114.9 150.2 104.8ZM78.8 94.0001C78.8 87.3001 103.7 90.6001 123.8 103.1C105.2 106.6 78.8 99.9001 78.8 94.0001Z" fill="none" stroke="#e0e0e0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="demo-label">Draw + Materialize</span>
+  </div>
+
+  <!-- V3: Perpetual snake -->
+  <div class="demo">
+    <svg class="v3" width="80" height="80" viewBox="50 35 120 150" xmlns="http://www.w3.org/2000/svg">
+      <path class="b-stroke" d="M150.2 104.8C154.8 99.5 157.4 93.3001 157.4 86.6001C157.4 61.7001 138.7 43.3 98.7 43.3C75.8 43.3 58.7 50.0001 58.7 50.0001L64.7 66.0001C64.7 66.0001 77 59.3 98.7 59.3C120.4 59.3 141.4 65.5001 141.4 86.6001C141.4 89.8001 140.6 92.4001 139.1 94.6001C122.8 82.1001 101.8 74.6001 85.4 74.6001C76.1 74.6001 62.1 79.3001 62.1 92.6001C62.1 113.9 94.8 119.9 112.1 119.9C121.8 119.9 130.5 117.8 137.7 114.3C144.3 121.5 148.8 130.3 148.8 140.6C148.8 156.4 132.1 159.9 122.8 159.9C97.5 159.9 82.8 142.8 78.1 132.6L62.8 136.6V172.6H78.8V159.3C78.8 159.3 94.9 176.6 122.8 176.6C149.5 176.6 165.5 160.9 165.5 140.6C165.4 127.1 159.4 114.9 150.2 104.8ZM78.8 94.0001C78.8 87.3001 103.7 90.6001 123.8 103.1C105.2 106.6 78.8 99.9001 78.8 94.0001Z" fill="none" stroke="#e0e0e0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="demo-label">Perpetual Trace</span>
+  </div>
+
+  <!-- V4: Slow materialization with glow -->
+  <div class="demo">
+    <svg class="v4" width="80" height="80" viewBox="50 35 120 150" xmlns="http://www.w3.org/2000/svg">
+      <path class="b-fill" d="M150.2 104.8C154.8 99.5 157.4 93.3001 157.4 86.6001C157.4 61.7001 138.7 43.3 98.7 43.3C75.8 43.3 58.7 50.0001 58.7 50.0001L64.7 66.0001C64.7 66.0001 77 59.3 98.7 59.3C120.4 59.3 141.4 65.5001 141.4 86.6001C141.4 89.8001 140.6 92.4001 139.1 94.6001C122.8 82.1001 101.8 74.6001 85.4 74.6001C76.1 74.6001 62.1 79.3001 62.1 92.6001C62.1 113.9 94.8 119.9 112.1 119.9C121.8 119.9 130.5 117.8 137.7 114.3C144.3 121.5 148.8 130.3 148.8 140.6C148.8 156.4 132.1 159.9 122.8 159.9C97.5 159.9 82.8 142.8 78.1 132.6L62.8 136.6V172.6H78.8V159.3C78.8 159.3 94.9 176.6 122.8 176.6C149.5 176.6 165.5 160.9 165.5 140.6C165.4 127.1 159.4 114.9 150.2 104.8ZM78.8 94.0001C78.8 87.3001 103.7 90.6001 123.8 103.1C105.2 106.6 78.8 99.9001 78.8 94.0001Z" fill="#e0e0e0" fill-opacity="0"/>
+      <path class="b-stroke" d="M150.2 104.8C154.8 99.5 157.4 93.3001 157.4 86.6001C157.4 61.7001 138.7 43.3 98.7 43.3C75.8 43.3 58.7 50.0001 58.7 50.0001L64.7 66.0001C64.7 66.0001 77 59.3 98.7 59.3C120.4 59.3 141.4 65.5001 141.4 86.6001C141.4 89.8001 140.6 92.4001 139.1 94.6001C122.8 82.1001 101.8 74.6001 85.4 74.6001C76.1 74.6001 62.1 79.3001 62.1 92.6001C62.1 113.9 94.8 119.9 112.1 119.9C121.8 119.9 130.5 117.8 137.7 114.3C144.3 121.5 148.8 130.3 148.8 140.6C148.8 156.4 132.1 159.9 122.8 159.9C97.5 159.9 82.8 142.8 78.1 132.6L62.8 136.6V172.6H78.8V159.3C78.8 159.3 94.9 176.6 122.8 176.6C149.5 176.6 165.5 160.9 165.5 140.6C165.4 127.1 159.4 114.9 150.2 104.8ZM78.8 94.0001C78.8 87.3001 103.7 90.6001 123.8 103.1C105.2 106.6 78.8 99.9001 78.8 94.0001Z" fill="none" stroke="#e0e0e0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="demo-label">Slow Glow</span>
+  </div>
+
+</div>
+
+</body>
+</html>
