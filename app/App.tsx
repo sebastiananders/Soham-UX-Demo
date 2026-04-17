@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Home, PieChart, Globe, Ticket, Bell, TrendingUp, AlertCircle, Plus, Mic, Paperclip, MoreHorizontal, ChevronLeft, ChevronRight, X, ArrowUp, MessageSquare } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, ReferenceLine, ResponsiveContainer } from 'recharts';
 import imgLogo from "../imports/DeviceMacBookPro14/c4121c79ef3207dcf24c7435552bb7378ad17369.png";
 import imgProfile from "../imports/DeviceMacBookPro14/d48bb91af6b62d07c468e4d0ae99ca184be233a8.png";
 import { Illustration } from './components/FigmaIcons';
@@ -379,26 +380,42 @@ function WarmContactsChatView({ onBack }: { onBack: () => void }) {
 
 function RegistrationInsightChatView({ onBack }: { onBack: () => void }) {
   const [loading, setLoading] = useState(true);
+  const [draftState, setDraftState] = useState<'idle' | 'thinking' | 'done'>('idle');
+  const [draftChosen, setDraftChosen] = useState<number | null>(null);
+  const [rightTab, setRightTab] = useState<'report' | 'draft'>('report');
 
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 3500);
     return () => clearTimeout(t);
   }, []);
 
+  const handleDraftRequest = () => {
+    setDraftState('thinking');
+    setTimeout(() => {
+      setDraftState('done');
+      setRightTab('draft');
+    }, 3000);
+  };
+
   const weeklyData = [
     { label: 'Mar 3', count: 89 },
     { label: 'Mar 10', count: 134 },
     { label: 'Mar 17', count: 156 },
     { label: 'Mar 24', count: 198 },
-    { label: 'Apr 1', count: 35, current: true },
+    { label: 'Apr 1', count: 35 },
   ];
-  const maxCount = 200;
 
-  const revenueProjections = [
-    { label: 'Current', value: 183600, max: 312000, color: 'bg-emerald-400' },
-    { label: 'Pace projection', value: 216000, max: 312000, color: 'bg-blue-400' },
-    { label: 'With early-bird push', value: 240000, max: 312000, color: 'bg-[#FFF000]' },
-    { label: 'Full target', value: 312000, max: 312000, color: 'bg-neutral-200' },
+  const revenueScenarios = [
+    { label: 'Current pace',    value: 183600, accent: '#45C4B0' },
+    { label: 'Pace projection', value: 216000, accent: '#13678A' },
+    { label: 'Early-bird push', value: 240000, accent: '#012030' },
+    { label: 'Full target',     value: 312000, accent: '#E5E5E5' },
+  ];
+
+  const ticketTiers = [
+    { tier: 'Early-bird', registered: 289, capacity: 400, color: '#012030' },
+    { tier: 'Standard',   registered: 214, capacity: 400, color: '#13678A' },
+    { tier: 'VIP',        registered: 109, capacity: 200, color: '#45C4B0' },
   ];
 
   return (
@@ -468,12 +485,62 @@ function RegistrationInsightChatView({ onBack }: { onBack: () => void }) {
                 <button className="px-5 py-2 bg-[#FFF000] rounded-full text-sm font-semibold text-neutral-900 hover:brightness-95 transition-all cursor-pointer">
                   Share with team
                 </button>
-                <button className="px-5 py-2 bg-neutral-50 rounded-full text-sm font-medium text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer">
+                <button
+                  onClick={handleDraftRequest}
+                  className="px-5 py-2 bg-neutral-50 rounded-full text-sm font-medium text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer"
+                >
                   Draft exec summary
                 </button>
               </div>
             </div>
           </div>
+
+          {/* ── Draft variants (after button click) ── */}
+          {draftState !== 'idle' && (
+            <>
+              {/* User message */}
+              <div className="flex gap-3 justify-end">
+                <div className="bg-neutral-100 rounded-[14px] rounded-tr-[4px] px-4 py-3 max-w-[260px]">
+                  <p className="text-sm text-neutral-800">Draft exec summary</p>
+                </div>
+              </div>
+
+              {/* Soham response */}
+              <div className="flex gap-3">
+                <div className="w-7 h-7 rounded-full bg-white border border-neutral-200 flex items-center justify-center shrink-0 mt-0.5 overflow-hidden p-1">
+                  <img src={imgLogo} alt="Soham" className="w-full h-full object-contain" />
+                </div>
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-sm font-semibold text-neutral-900">Soham</span>
+                    <span className="text-xs text-neutral-400">3:04 PM</span>
+                  </div>
+
+                  {draftState === 'thinking' ? (
+                    /* ── Thinking animation ── */
+                    <div className="flex items-center gap-3 py-2">
+                      <svg width="28" height="28" viewBox="50 35 120 150" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M150.2 104.8C154.8 99.5 157.4 93.3001 157.4 86.6001C157.4 61.7001 138.7 43.3 98.7 43.3C75.8 43.3 58.7 50.0001 58.7 50.0001L64.7 66.0001C64.7 66.0001 77 59.3 98.7 59.3C120.4 59.3 141.4 65.5001 141.4 86.6001C141.4 89.8001 140.6 92.4001 139.1 94.6001C122.8 82.1001 101.8 74.6001 85.4 74.6001C76.1 74.6001 62.1 79.3001 62.1 92.6001C62.1 113.9 94.8 119.9 112.1 119.9C121.8 119.9 130.5 117.8 137.7 114.3C144.3 121.5 148.8 130.3 148.8 140.6C148.8 156.4 132.1 159.9 122.8 159.9C97.5 159.9 82.8 142.8 78.1 132.6L62.8 136.6V172.6H78.8V159.3C78.8 159.3 94.9 176.6 122.8 176.6C149.5 176.6 165.5 160.9 165.5 140.6C165.4 127.1 159.4 114.9 150.2 104.8ZM78.8 94.0001C78.8 87.3001 103.7 90.6001 123.8 103.1C105.2 106.6 78.8 99.9001 78.8 94.0001Z"
+                          fill="none"
+                          stroke="#171717"
+                          strokeWidth="3"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          style={{ strokeDasharray: '400 800', animation: 'bTrace 2.5s linear infinite' }}
+                        />
+                      </svg>
+                      <span className="text-sm text-neutral-400">Drafting two versions…</span>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-neutral-700 leading-relaxed">
+                      Two drafts are ready — pick your tone in the <strong className="font-semibold text-neutral-900">Exec Summary</strong> tab on the right →
+                    </p>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="shrink-0 pb-6 pt-3 px-5">
@@ -491,7 +558,7 @@ function RegistrationInsightChatView({ onBack }: { onBack: () => void }) {
       </div>
 
       {/* ── Right: Exec summary report ── */}
-      <div className="flex-1 flex flex-col bg-neutral-50 overflow-hidden">
+      <div className="flex-1 flex flex-col bg-white overflow-hidden">
 
         {loading ? (
           /* ── Loading state: perpetual B trace ── */
@@ -518,79 +585,255 @@ function RegistrationInsightChatView({ onBack }: { onBack: () => void }) {
             </svg>
             <p className="text-sm text-neutral-400">Pulling most recent data…</p>
           </div>
+        ) : draftState === 'thinking' ? (
+          /* ── Drafting state: same B trace animation ── */
+          <div className="flex-1 flex flex-col items-center justify-center gap-5">
+            <svg width="72" height="72" viewBox="50 35 120 150" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M150.2 104.8C154.8 99.5 157.4 93.3001 157.4 86.6001C157.4 61.7001 138.7 43.3 98.7 43.3C75.8 43.3 58.7 50.0001 58.7 50.0001L64.7 66.0001C64.7 66.0001 77 59.3 98.7 59.3C120.4 59.3 141.4 65.5001 141.4 86.6001C141.4 89.8001 140.6 92.4001 139.1 94.6001C122.8 82.1001 101.8 74.6001 85.4 74.6001C76.1 74.6001 62.1 79.3001 62.1 92.6001C62.1 113.9 94.8 119.9 112.1 119.9C121.8 119.9 130.5 117.8 137.7 114.3C144.3 121.5 148.8 130.3 148.8 140.6C148.8 156.4 132.1 159.9 122.8 159.9C97.5 159.9 82.8 142.8 78.1 132.6L62.8 136.6V172.6H78.8V159.3C78.8 159.3 94.9 176.6 122.8 176.6C149.5 176.6 165.5 160.9 165.5 140.6C165.4 127.1 159.4 114.9 150.2 104.8ZM78.8 94.0001C78.8 87.3001 103.7 90.6001 123.8 103.1C105.2 106.6 78.8 99.9001 78.8 94.0001Z"
+                fill="none"
+                stroke="#171717"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{
+                  strokeDasharray: '400 800',
+                  animation: 'bTrace 2.5s linear infinite',
+                }}
+              />
+            </svg>
+            <p className="text-sm text-neutral-400">Drafting two versions…</p>
+          </div>
         ) : (
+        <>
+          {/* ── Tab bar (appears once exec summary is ready) ── */}
+          {draftState === 'done' && (
+            <div className="shrink-0 flex items-center border-b border-neutral-100 px-10">
+              <button
+                onClick={() => setRightTab('report')}
+                className={`px-4 py-3.5 text-xs font-semibold border-b-2 -mb-px transition-colors cursor-pointer ${
+                  rightTab === 'report'
+                    ? 'border-neutral-900 text-neutral-900'
+                    : 'border-transparent text-neutral-400 hover:text-neutral-600'
+                }`}
+              >
+                Insight Report
+              </button>
+              <button
+                onClick={() => setRightTab('draft')}
+                className={`px-4 py-3.5 text-xs font-semibold border-b-2 -mb-px transition-colors cursor-pointer ${
+                  rightTab === 'draft'
+                    ? 'border-neutral-900 text-neutral-900'
+                    : 'border-transparent text-neutral-400 hover:text-neutral-600'
+                }`}
+              >
+                Exec Summary
+              </button>
+            </div>
+          )}
 
-        <div className="flex-1 overflow-y-auto px-8 py-8 flex flex-col gap-6">
+          {rightTab === 'draft' ? (
 
-          {/* Report header */}
-          <div>
-            <h2 className="text-lg font-semibold text-neutral-900">Registration Insight Report</h2>
-            <p className="text-xs text-neutral-400 mt-0.5">Tech Summit Europe 2026 · Generated April 16, 2026</p>
-          </div>
+          /* ── Exec Summary tab ── */
+          <div className="flex-1 overflow-y-auto px-10 py-10 flex flex-col gap-8">
+            <div>
+              <h2 className="text-sm font-semibold text-neutral-900 tracking-wide uppercase">Exec Summary Drafts</h2>
+              <p className="text-xs text-neutral-400 mt-1">Tech Summit Europe 2026 · Two tone variants — pick one</p>
+            </div>
 
-          {/* KPI grid */}
-          <div className="grid grid-cols-4 gap-3">
-            {[
-              { label: 'Registered', value: '612', sub: '61% of target', dot: 'bg-emerald-400' },
-              { label: 'Revenue to date', value: '€183,600', sub: '€300 avg ticket', dot: 'bg-blue-400' },
-              { label: 'Early-bird window', value: '3 days', sub: 'Closes Friday', dot: 'bg-amber-400' },
-              { label: 'Remaining to goal', value: '388', sub: 'Target: 1,000 seats', dot: 'bg-neutral-300' },
-            ].map((kpi, i) => (
-              <div key={i} className="bg-white rounded-[12px] p-4 border border-neutral-100 shadow-[0px_1px_4px_0px_rgba(0,0,0,0.04)]">
-                <div className="flex items-center gap-1.5 mb-2">
-                  <div className={`w-1.5 h-1.5 rounded-full ${kpi.dot}`} />
-                  <span className="text-[11px] text-neutral-400 font-medium">{kpi.label}</span>
+            <div className="flex flex-col gap-5">
+              {/* Variant A — Formal */}
+              <div
+                className="rounded-[16px] border p-6 flex flex-col gap-4 cursor-pointer transition-all"
+                style={{
+                  borderColor: draftChosen === 0 ? '#45C4B0' : '#e5e5e5',
+                  backgroundColor: draftChosen === 0 ? '#f4fcfb' : '#fafafa',
+                }}
+                onClick={() => setDraftChosen(draftChosen === 0 ? null : 0)}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">Formal / data-led</span>
+                  {draftChosen === 0 && (
+                    <span className="flex items-center gap-1 text-[10px] font-semibold" style={{ color: '#13678A' }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                      Selected
+                    </span>
+                  )}
                 </div>
-                <p className="text-xl font-semibold text-neutral-900 leading-none">{kpi.value}</p>
-                <p className="text-[11px] text-neutral-400 mt-1">{kpi.sub}</p>
+                <p className="text-sm text-neutral-700 leading-relaxed">
+                  Tech Summit Europe 2026 has reached 612 registrations (61% of the 1,000-seat target), generating €183,600 in revenue. Registration velocity peaked at 198 in the week of Mar 24. With 3 days remaining on early-bird pricing, the projected range is 720–780 total registrations and €216K–€240K in revenue.
+                </p>
+                <button
+                  onClick={(e) => { e.stopPropagation(); setDraftChosen(0); }}
+                  className="self-start px-4 py-1.5 rounded-full text-xs font-semibold text-white transition-colors"
+                  style={{ backgroundColor: draftChosen === 0 ? '#13678A' : '#012030' }}
+                >
+                  {draftChosen === 0 ? 'Chosen' : 'Use this'}
+                </button>
               </div>
-            ))}
-          </div>
 
-          {/* Registration velocity chart */}
-          <div className="bg-white rounded-[14px] p-5 border border-neutral-100 shadow-[0px_1px_4px_0px_rgba(0,0,0,0.04)]">
-            <h3 className="text-xs font-semibold text-neutral-700 mb-1">Registration velocity</h3>
-            <p className="text-[11px] text-neutral-400 mb-5">Weekly registrations · Tech Summit Europe 2026</p>
-            <div className="flex items-end gap-3 h-[100px]">
-              {weeklyData.map((d, i) => (
-                <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
-                  <span className="text-[10px] font-medium text-neutral-500">{d.count}</span>
-                  <div className="w-full relative flex items-end" style={{ height: '72px' }}>
-                    <div
-                      className={`w-full rounded-t-[4px] transition-all ${'current' in d && d.current ? 'bg-[#FFF000]' : 'bg-neutral-900'}`}
-                      style={{ height: `${(d.count / maxCount) * 72}px` }}
-                    />
-                  </div>
-                  <span className="text-[10px] text-neutral-400">{d.label}</span>
+              {/* Variant B — Narrative */}
+              <div
+                className="rounded-[16px] border p-6 flex flex-col gap-4 cursor-pointer transition-all"
+                style={{
+                  borderColor: draftChosen === 1 ? '#45C4B0' : '#e5e5e5',
+                  backgroundColor: draftChosen === 1 ? '#f4fcfb' : '#fafafa',
+                }}
+                onClick={() => setDraftChosen(draftChosen === 1 ? null : 1)}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">Narrative / momentum</span>
+                  {draftChosen === 1 && (
+                    <span className="flex items-center gap-1 text-[10px] font-semibold" style={{ color: '#13678A' }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                      Selected
+                    </span>
+                  )}
                 </div>
-              ))}
-            </div>
-            <p className="text-[11px] text-neutral-400 mt-4">Current week (Apr 1) is partial · Total registrations: 612</p>
-          </div>
-
-          {/* Revenue projection */}
-          <div className="bg-white rounded-[14px] p-5 border border-neutral-100 shadow-[0px_1px_4px_0px_rgba(0,0,0,0.04)]">
-            <h3 className="text-xs font-semibold text-neutral-700 mb-1">Revenue projection</h3>
-            <p className="text-[11px] text-neutral-400 mb-5">Based on €300 average ticket price</p>
-            <div className="flex flex-col gap-4">
-              {revenueProjections.map((r, i) => (
-                <div key={i} className="flex flex-col gap-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] text-neutral-500">{r.label}</span>
-                    <span className="text-[11px] font-semibold text-neutral-900">€{r.value.toLocaleString()}</span>
-                  </div>
-                  <div className="w-full h-2 bg-neutral-100 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full ${r.color}`}
-                      style={{ width: `${(r.value / r.max) * 100}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
+                <p className="text-sm text-neutral-700 leading-relaxed">
+                  We're 61% to goal and accelerating — last week was our strongest yet. With early-bird closing in 3 days, we have a real window to push. At current pace we're on track for €216K; if we activate the early-bird push, €240K is within reach. Now's the moment to move.
+                </p>
+                <button
+                  onClick={(e) => { e.stopPropagation(); setDraftChosen(1); }}
+                  className="self-start px-4 py-1.5 rounded-full text-xs font-semibold text-white transition-colors"
+                  style={{ backgroundColor: draftChosen === 1 ? '#13678A' : '#012030' }}
+                >
+                  {draftChosen === 1 ? 'Chosen' : 'Use this'}
+                </button>
+              </div>
             </div>
           </div>
 
-        </div>
+          ) : (
+
+          <div className="flex-1 overflow-y-auto px-10 py-10 flex flex-col gap-12">
+
+          {/* ── Report masthead ── */}
+          <div>
+            <h2 className="text-sm font-semibold text-neutral-900 tracking-wide uppercase">Registration Insight Report</h2>
+            <p className="text-xs text-neutral-400 mt-1">Tech Summit Europe 2026 · Generated April 17, 2026</p>
+          </div>
+
+          {/* ── Section 1: The Situation ── */}
+          <section className="flex flex-col gap-5">
+            <div className="flex items-baseline gap-4">
+              <span className="text-[72px] font-semibold leading-none tracking-tighter text-neutral-900" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                612
+              </span>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-base text-neutral-500 font-normal">registered</span>
+                <span className="text-xs text-neutral-400">of 1,000 target</span>
+              </div>
+            </div>
+            <div className="w-full h-[3px] bg-neutral-100 rounded-full">
+              <div className="h-full rounded-full" style={{ width: '61.2%', backgroundColor: '#012030' }} />
+            </div>
+            <div className="flex items-center divide-x divide-neutral-100">
+              <span className="pr-6 text-sm text-neutral-500"><strong className="font-semibold text-neutral-900">61%</strong> to goal</span>
+              <span className="px-6 text-sm text-neutral-500"><strong className="font-semibold text-neutral-900">€183,600</strong> raised</span>
+              <span className="pl-6 text-sm text-neutral-500"><strong className="font-semibold" style={{ color: '#13678A' }}>3 days</strong> of early-bird left</span>
+            </div>
+          </section>
+
+          <hr className="border-t border-neutral-100" />
+
+          {/* ── Section 2: Registration Momentum ── */}
+          <section className="flex flex-col gap-3">
+            <div>
+              <h3 className="text-xs font-semibold text-neutral-400 uppercase tracking-widest">Registration momentum</h3>
+            </div>
+            <div className="relative mt-2">
+              {/* Annotation badge over Mar 24 peak */}
+              <div className="absolute z-10 pointer-events-none" style={{ left: 'calc(76% - 32px)', top: '-2px' }}>
+                <div className="bg-neutral-900 text-white text-[10px] font-semibold px-2.5 py-1 rounded-full whitespace-nowrap">
+                  +27% peak
+                </div>
+                <div className="w-px h-3 bg-neutral-300 mx-auto mt-0.5" />
+              </div>
+              <ResponsiveContainer width="100%" height={150}>
+                <AreaChart data={weeklyData} margin={{ top: 20, right: 4, left: -20, bottom: 0 }}>
+                  <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#a3a3a3', fontFamily: 'inherit' }} dy={6} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#a3a3a3', fontFamily: 'inherit' }} tickCount={4} width={36} />
+                  <ReferenceLine x="Mar 24" stroke="#e5e5e5" strokeWidth={1} strokeDasharray="3 3" />
+                  <Area type="monotone" dataKey="count" stroke="#012030" strokeWidth={1.5} fill="#45C4B0" fillOpacity={0.12} dot={false} activeDot={{ r: 3, fill: '#012030', strokeWidth: 0 }} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+            <p className="text-[11px] text-neutral-400">
+              Velocity accelerating — Mar 24 was your strongest week · Current week (Apr 1) is partial
+            </p>
+          </section>
+
+          <hr className="border-t border-neutral-100" />
+
+          {/* ── Section 3: Small Multiples — Ticket Tier Fill Rate ── */}
+          <section className="flex flex-col gap-5">
+            <div>
+              <h3 className="text-xs font-semibold text-neutral-400 uppercase tracking-widest">Ticket tier fill rate</h3>
+              <p className="text-[11px] text-neutral-400 mt-1">Registered vs. capacity per tier</p>
+            </div>
+            <div className="grid grid-cols-3 gap-8">
+              {ticketTiers.map((tier) => {
+                const pct = Math.round((tier.registered / tier.capacity) * 100);
+                return (
+                  <div key={tier.tier} className="flex flex-col gap-3 relative">
+                    {tier.tier === 'Early-bird' && (
+                      <span className="absolute -top-2 right-0 text-[9px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap" style={{ backgroundColor: '#e8f6f8', border: '1px solid #13678A', color: '#012030' }}>
+                        Closes in 3 days
+                      </span>
+                    )}
+                    <span className="text-xs font-semibold text-neutral-700">{tier.tier}</span>
+                    <div className="w-full h-[5px] bg-neutral-100 rounded-full overflow-hidden">
+                      <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: tier.color }} />
+                    </div>
+                    <div className="flex items-baseline justify-between">
+                      <span className="text-xl font-semibold text-neutral-900 tabular-nums leading-none">{pct}%</span>
+                      <span className="text-[10px] text-neutral-400">{tier.registered} / {tier.capacity}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          <hr className="border-t border-neutral-100" />
+
+          {/* ── Section 4: Revenue Scenarios (Lollipop) ── */}
+          <section className="flex flex-col gap-5">
+            <div>
+              <h3 className="text-xs font-semibold text-neutral-400 uppercase tracking-widest">Revenue scenarios</h3>
+              <p className="text-[11px] text-neutral-400 mt-1">Based on €300 average ticket price</p>
+            </div>
+            <div className="flex flex-col gap-7 pt-1">
+              {revenueScenarios.map((s) => {
+                const pct = (s.value / 312000) * 100;
+                return (
+                  <div key={s.label} className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-neutral-500">{s.label}</span>
+                      <span className="text-sm font-semibold text-neutral-900 tabular-nums">€{(s.value / 1000).toFixed(0)}K</span>
+                    </div>
+                    <div className="relative w-full h-[1px] bg-neutral-100">
+                      <div className="absolute top-0 left-0 h-[1px]" style={{ width: `${pct}%`, backgroundColor: s.accent === '#E5E5E5' ? '#d4d4d4' : s.accent }} />
+                      <div
+                        className="absolute top-1/2 -translate-y-1/2 w-[8px] h-[8px] rounded-full border-2 border-white"
+                        style={{ left: `calc(${Math.min(pct, 98)}% - 4px)`, backgroundColor: s.accent === '#E5E5E5' ? '#d4d4d4' : s.accent }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+              <div className="flex justify-between pt-1">
+                <span className="text-[10px] text-neutral-300">€0</span>
+                <span className="text-[10px] text-neutral-300">€312K full target</span>
+              </div>
+            </div>
+          </section>
+
+          </div>
+
+          )} {/* end rightTab conditional */}
+        </>
         )} {/* end loading conditional */}
       </div>
 
