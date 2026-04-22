@@ -1,3 +1,47 @@
 @import './fonts.css';
 @import './tailwind.css';
 @import './theme.css';
+
+/* ── Ant Design overrides ─────────────────────────────────────────────────── */
+
+/* Ensure ant design buttons inherit font */
+.ant-btn {
+  font-family: inherit;
+}
+
+/* InsightsCanvas Tabs: make content fill height and scroll */
+.insights-tabs .ant-tabs-content-holder {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.insights-tabs .ant-tabs-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.insights-tabs .ant-tabs-tabpane {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Remove Ant Design Table box-shadow that conflicts with our wrapper */
+.ant-table-wrapper {
+  font-family: inherit;
+}
+
+/* Prevent antd from adding margin to tabs nav bar */
+.insights-tabs .ant-tabs-nav {
+  margin-bottom: 0;
+}
+
+.insights-tabs .ant-tabs-nav::before {
+  display: none;
+}

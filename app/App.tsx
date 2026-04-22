@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Home, PieChart, Globe, Ticket, Bell, TrendingUp, AlertCircle, Plus, Mic, Paperclip, MoreHorizontal, ChevronLeft, X, ArrowUp, MessageSquare, Check } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, ReferenceLine, ResponsiveContainer } from 'recharts';
+import { Button, Tag, Badge, Avatar, Tabs, Table } from 'antd';
+import type { TableProps } from 'antd';
 import imgLogo from "../imports/DeviceMacBookPro14/c4121c79ef3207dcf24c7435552bb7378ad17369.png";
 import imgProfile from "../imports/DeviceMacBookPro14/d48bb91af6b62d07c468e4d0ae99ca184be233a8.png";
 import { Illustration } from './components/FigmaIcons';
@@ -82,6 +84,35 @@ const warmContacts = [
   { name: 'Tobias Kern',     company: 'SAP SE',          email: 't.kern@sap.com',           opened: '5 days ago' },
 ];
 
+type WarmContact = typeof warmContacts[0];
+
+const contactColumns: TableProps<WarmContact>['columns'] = [
+  {
+    title: 'Name',
+    dataIndex: 'name',
+    key: 'name',
+    render: (text: string) => <span className="font-medium text-neutral-900 text-xs">{text}</span>,
+  },
+  {
+    title: 'Company',
+    dataIndex: 'company',
+    key: 'company',
+    render: (text: string) => <span className="text-neutral-500 text-xs">{text}</span>,
+  },
+  {
+    title: 'Email',
+    dataIndex: 'email',
+    key: 'email',
+    render: (text: string) => <span className="text-neutral-500 text-xs">{text}</span>,
+  },
+  {
+    title: 'Opened',
+    dataIndex: 'opened',
+    key: 'opened',
+    render: (text: string) => <span className="text-neutral-400 text-xs">{text}</span>,
+  },
+];
+
 function WebsiteCanvas() {
   return (
     <div className="flex-1 flex flex-col bg-neutral-50 overflow-hidden">
@@ -120,7 +151,9 @@ function WebsiteCanvas() {
             </div>
             <div className="relative bg-white rounded-[12px] p-5 border-2 border-[#FFF000] shadow-[0px_2px_12px_0px_rgba(255,240,0,0.2)]">
               <div className="absolute -top-2.5 left-4">
-                <span className="bg-[#FFF000] text-neutral-900 text-[10px] font-semibold px-2.5 py-0.5 rounded-full">Pending approval</span>
+                <Tag style={{ backgroundColor: '#FFF000', color: '#171717', borderColor: '#FFF000', fontSize: 10, fontWeight: 600, lineHeight: '18px' }}>
+                  Pending approval
+                </Tag>
               </div>
               <div className="w-16 h-16 rounded-full bg-neutral-100 mb-4 flex items-center justify-center">
                 <span className="text-neutral-400 text-[10px] font-medium">Photo</span>
@@ -143,7 +176,9 @@ function ContactsCanvas() {
         <div className="px-8 pt-8 pb-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold text-neutral-900">Email draft</h3>
-            <span className="text-xs bg-[#FFF000] text-neutral-900 font-semibold px-2.5 py-0.5 rounded-full">Pending approval</span>
+            <Tag style={{ backgroundColor: '#FFF000', color: '#171717', borderColor: '#FFF000', fontWeight: 600 }}>
+              Pending approval
+            </Tag>
           </div>
           <div className="bg-white rounded-[14px] border border-neutral-100 shadow-[0px_1px_9px_0px_rgba(0,0,0,0.05)] overflow-hidden">
             <div className="border-b border-neutral-100 px-6 py-4 flex flex-col gap-2">
@@ -165,27 +200,17 @@ function ContactsCanvas() {
             <h3 className="text-sm font-semibold text-neutral-900">Contact segment <span className="text-neutral-400 font-normal">· 340 contacts</span></h3>
           </div>
           <div className="bg-white rounded-[14px] border border-neutral-100 shadow-[0px_1px_9px_0px_rgba(0,0,0,0.05)] overflow-hidden">
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="border-b border-neutral-100">
-                  <th className="text-left px-5 py-3 text-neutral-400 font-medium">Name</th>
-                  <th className="text-left px-5 py-3 text-neutral-400 font-medium">Company</th>
-                  <th className="text-left px-5 py-3 text-neutral-400 font-medium">Email</th>
-                  <th className="text-left px-5 py-3 text-neutral-400 font-medium">Opened</th>
-                </tr>
-              </thead>
-              <tbody>
-                {warmContacts.map((c, i) => (
-                  <tr key={i} className={i < warmContacts.length - 1 ? 'border-b border-neutral-50' : ''}>
-                    <td className="px-5 py-3 font-medium text-neutral-900">{c.name}</td>
-                    <td className="px-5 py-3 text-neutral-500">{c.company}</td>
-                    <td className="px-5 py-3 text-neutral-500">{c.email}</td>
-                    <td className="px-5 py-3 text-neutral-400">{c.opened}</td>
-                  </tr>
-                ))}
-                <tr><td colSpan={4} className="px-5 py-3 text-neutral-400 text-center">+ 334 more contacts</td></tr>
-              </tbody>
-            </table>
+            <Table<WarmContact>
+              dataSource={warmContacts}
+              columns={contactColumns}
+              size="small"
+              pagination={false}
+              rowKey="email"
+              footer={() => (
+                <span className="text-neutral-400 text-center block text-xs">+ 334 more contacts</span>
+              )}
+              style={{ fontFamily: 'inherit' }}
+            />
           </div>
         </div>
       </div>
@@ -225,151 +250,170 @@ function InsightsCanvas({ loading, draftState, draftChosen, rightTab, onTabChang
   if (loading) return <div className="flex-1 flex flex-col items-center justify-center"><BTrace size={72} label="Pulling most recent data…" /></div>;
   if (draftState === 'thinking') return <div className="flex-1 flex flex-col items-center justify-center"><BTrace size={72} label="Drafting two versions…" /></div>;
 
+  const reportContent = (
+    <div className="flex-1 overflow-y-auto px-10 py-10 flex flex-col gap-12">
+      <div>
+        <h2 className="text-sm font-semibold text-neutral-900 tracking-wide uppercase">Registration Insight Report</h2>
+        <p className="text-xs text-neutral-400 mt-1">Tech Summit Europe 2026 · Generated April 17, 2026</p>
+      </div>
+      <section className="flex flex-col gap-5">
+        <div className="flex items-baseline gap-4">
+          <span className="text-[72px] font-semibold leading-none tracking-tighter text-neutral-900" style={{ fontVariantNumeric: 'tabular-nums' }}>612</span>
+          <div className="flex flex-col gap-0.5">
+            <span className="text-base text-neutral-500 font-normal">registered</span>
+            <span className="text-xs text-neutral-400">of 1,000 target</span>
+          </div>
+        </div>
+        <div className="w-full h-[3px] bg-neutral-100 rounded-full">
+          <div className="h-full rounded-full" style={{ width: '61.2%', backgroundColor: '#012030' }} />
+        </div>
+        <div className="flex items-center divide-x divide-neutral-100">
+          <span className="pr-6 text-sm text-neutral-500"><strong className="font-semibold text-neutral-900">61%</strong> to goal</span>
+          <span className="px-6 text-sm text-neutral-500"><strong className="font-semibold text-neutral-900">€183,600</strong> raised</span>
+          <span className="pl-6 text-sm text-neutral-500"><strong className="font-semibold" style={{ color: '#13678A' }}>3 days</strong> of early-bird left</span>
+        </div>
+      </section>
+      <hr className="border-t border-neutral-100" />
+      <section className="flex flex-col gap-3">
+        <h3 className="text-xs font-semibold text-neutral-400 uppercase tracking-widest">Registration momentum</h3>
+        <div className="relative mt-2">
+          <div className="absolute z-10 pointer-events-none" style={{ left: 'calc(76% - 32px)', top: '-2px' }}>
+            <div className="bg-neutral-900 text-white text-[10px] font-semibold px-2.5 py-1 rounded-full whitespace-nowrap">+27% peak</div>
+            <div className="w-px h-3 bg-neutral-300 mx-auto mt-0.5" />
+          </div>
+          <ResponsiveContainer width="100%" height={150}>
+            <AreaChart data={weeklyData} margin={{ top: 20, right: 4, left: -20, bottom: 0 }}>
+              <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#a3a3a3', fontFamily: 'inherit' }} dy={6} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#a3a3a3', fontFamily: 'inherit' }} tickCount={4} width={36} />
+              <ReferenceLine x="Mar 24" stroke="#e5e5e5" strokeWidth={1} strokeDasharray="3 3" />
+              <Area type="monotone" dataKey="count" stroke="#012030" strokeWidth={1.5} fill="#45C4B0" fillOpacity={0.12} dot={false} activeDot={{ r: 3, fill: '#012030', strokeWidth: 0 }} />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+        <p className="text-[11px] text-neutral-400">Velocity accelerating — Mar 24 was your strongest week · Current week (Apr 1) is partial</p>
+      </section>
+      <hr className="border-t border-neutral-100" />
+      <section className="flex flex-col gap-5">
+        <div>
+          <h3 className="text-xs font-semibold text-neutral-400 uppercase tracking-widest">Ticket tier fill rate</h3>
+          <p className="text-[11px] text-neutral-400 mt-1">Registered vs. capacity per tier</p>
+        </div>
+        <div className="grid grid-cols-3 gap-8">
+          {ticketTiers.map(tier => {
+            const pct = Math.round((tier.registered / tier.capacity) * 100);
+            return (
+              <div key={tier.tier} className="flex flex-col gap-3 relative">
+                {tier.tier === 'Early-bird' && (
+                  <span className="absolute -top-2 right-0 text-[9px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap" style={{ backgroundColor: '#e8f6f8', border: '1px solid #13678A', color: '#012030' }}>Closes in 3 days</span>
+                )}
+                <span className="text-xs font-semibold text-neutral-700">{tier.tier}</span>
+                <div className="w-full h-[5px] bg-neutral-100 rounded-full overflow-hidden">
+                  <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: tier.color }} />
+                </div>
+                <div className="flex items-baseline justify-between">
+                  <span className="text-xl font-semibold text-neutral-900 tabular-nums leading-none">{pct}%</span>
+                  <span className="text-[10px] text-neutral-400">{tier.registered} / {tier.capacity}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+      <hr className="border-t border-neutral-100" />
+      <section className="flex flex-col gap-5">
+        <div>
+          <h3 className="text-xs font-semibold text-neutral-400 uppercase tracking-widest">Revenue scenarios</h3>
+          <p className="text-[11px] text-neutral-400 mt-1">Based on €300 average ticket price</p>
+        </div>
+        <div className="flex flex-col gap-7 pt-1">
+          {revenueScenarios.map(s => {
+            const pct = (s.value / 312000) * 100;
+            return (
+              <div key={s.label} className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-neutral-500">{s.label}</span>
+                  <span className="text-sm font-semibold text-neutral-900 tabular-nums">€{(s.value / 1000).toFixed(0)}K</span>
+                </div>
+                <div className="relative w-full h-[1px] bg-neutral-100">
+                  <div className="absolute top-0 left-0 h-[1px]" style={{ width: `${pct}%`, backgroundColor: s.accent === '#E5E5E5' ? '#d4d4d4' : s.accent }} />
+                  <div className="absolute top-1/2 -translate-y-1/2 w-[8px] h-[8px] rounded-full border-2 border-white"
+                    style={{ left: `calc(${Math.min(pct, 98)}% - 4px)`, backgroundColor: s.accent === '#E5E5E5' ? '#d4d4d4' : s.accent }} />
+                </div>
+              </div>
+            );
+          })}
+          <div className="flex justify-between pt-1">
+            <span className="text-[10px] text-neutral-300">€0</span>
+            <span className="text-[10px] text-neutral-300">€312K full target</span>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+
+  const draftContent = (
+    <div className="flex-1 overflow-y-auto px-10 py-10 flex flex-col gap-8">
+      <div>
+        <h2 className="text-sm font-semibold text-neutral-900 tracking-wide uppercase">Exec Summary Drafts</h2>
+        <p className="text-xs text-neutral-400 mt-1">Tech Summit Europe 2026 · Two tone variants — pick one</p>
+      </div>
+      <div className="flex flex-col gap-5">
+        {[
+          { id: 0, label: 'Formal / data-led', text: "Tech Summit Europe 2026 has reached 612 registrations (61% of the 1,000-seat target), generating €183,600 in revenue. Registration velocity peaked at 198 in the week of Mar 24. With 3 days remaining on early-bird pricing, the projected range is 720–780 total registrations and €216K–€240K in revenue." },
+          { id: 1, label: 'Narrative / momentum', text: "We're 61% to goal and accelerating — last week was our strongest yet. With early-bird closing in 3 days, we have a real window to push. At current pace we're on track for €216K; if we activate the early-bird push, €240K is within reach. Now's the moment to move." },
+        ].map(v => (
+          <div key={v.id} onClick={() => onChooseDraft(draftChosen === v.id ? -1 : v.id)}
+            className="rounded-[16px] border p-6 flex flex-col gap-4 cursor-pointer transition-all"
+            style={{ borderColor: draftChosen === v.id ? '#45C4B0' : '#e5e5e5', backgroundColor: draftChosen === v.id ? '#f4fcfb' : '#fafafa' }}>
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">{v.label}</span>
+              {draftChosen === v.id && (
+                <span className="flex items-center gap-1 text-[10px] font-semibold" style={{ color: '#13678A' }}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg> Selected
+                </span>
+              )}
+            </div>
+            <p className="text-sm text-neutral-700 leading-relaxed">{v.text}</p>
+            <Button
+              shape="round"
+              size="small"
+              type="primary"
+              onClick={e => { e.stopPropagation(); onChooseDraft(v.id); }}
+              style={{
+                alignSelf: 'flex-start',
+                backgroundColor: draftChosen === v.id ? '#13678A' : '#012030',
+                borderColor: draftChosen === v.id ? '#13678A' : '#012030',
+              }}
+            >
+              {draftChosen === v.id ? 'Chosen' : 'Use this'}
+            </Button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  if (draftState !== 'done') {
+    return (
+      <div className="flex-1 flex flex-col bg-white overflow-hidden">
+        {reportContent}
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1 flex flex-col bg-white overflow-hidden">
-      {draftState === 'done' && (
-        <div className="shrink-0 flex items-center border-b border-neutral-100 px-10">
-          {(['report', 'draft'] as const).map(tab => (
-            <button key={tab} onClick={() => onTabChange(tab)}
-              className={`px-4 py-3.5 text-xs font-semibold border-b-2 -mb-px transition-colors cursor-pointer ${rightTab === tab ? 'border-neutral-900 text-neutral-900' : 'border-transparent text-neutral-400 hover:text-neutral-600'}`}>
-              {tab === 'report' ? 'Insight Report' : 'Exec Summary'}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {rightTab === 'draft' && draftState === 'done' ? (
-        <div className="flex-1 overflow-y-auto px-10 py-10 flex flex-col gap-8">
-          <div>
-            <h2 className="text-sm font-semibold text-neutral-900 tracking-wide uppercase">Exec Summary Drafts</h2>
-            <p className="text-xs text-neutral-400 mt-1">Tech Summit Europe 2026 · Two tone variants — pick one</p>
-          </div>
-          <div className="flex flex-col gap-5">
-            {[
-              { id: 0, label: 'Formal / data-led', text: "Tech Summit Europe 2026 has reached 612 registrations (61% of the 1,000-seat target), generating €183,600 in revenue. Registration velocity peaked at 198 in the week of Mar 24. With 3 days remaining on early-bird pricing, the projected range is 720–780 total registrations and €216K–€240K in revenue." },
-              { id: 1, label: 'Narrative / momentum', text: "We're 61% to goal and accelerating — last week was our strongest yet. With early-bird closing in 3 days, we have a real window to push. At current pace we're on track for €216K; if we activate the early-bird push, €240K is within reach. Now's the moment to move." },
-            ].map(v => (
-              <div key={v.id} onClick={() => onChooseDraft(draftChosen === v.id ? -1 : v.id)}
-                className="rounded-[16px] border p-6 flex flex-col gap-4 cursor-pointer transition-all"
-                style={{ borderColor: draftChosen === v.id ? '#45C4B0' : '#e5e5e5', backgroundColor: draftChosen === v.id ? '#f4fcfb' : '#fafafa' }}>
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">{v.label}</span>
-                  {draftChosen === v.id && (
-                    <span className="flex items-center gap-1 text-[10px] font-semibold" style={{ color: '#13678A' }}>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg> Selected
-                    </span>
-                  )}
-                </div>
-                <p className="text-sm text-neutral-700 leading-relaxed">{v.text}</p>
-                <button onClick={e => { e.stopPropagation(); onChooseDraft(v.id); }}
-                  className="self-start px-4 py-1.5 rounded-full text-xs font-semibold text-white transition-colors"
-                  style={{ backgroundColor: draftChosen === v.id ? '#13678A' : '#012030' }}>
-                  {draftChosen === v.id ? 'Chosen' : 'Use this'}
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      ) : (
-        <div className="flex-1 overflow-y-auto px-10 py-10 flex flex-col gap-12">
-          <div>
-            <h2 className="text-sm font-semibold text-neutral-900 tracking-wide uppercase">Registration Insight Report</h2>
-            <p className="text-xs text-neutral-400 mt-1">Tech Summit Europe 2026 · Generated April 17, 2026</p>
-          </div>
-          <section className="flex flex-col gap-5">
-            <div className="flex items-baseline gap-4">
-              <span className="text-[72px] font-semibold leading-none tracking-tighter text-neutral-900" style={{ fontVariantNumeric: 'tabular-nums' }}>612</span>
-              <div className="flex flex-col gap-0.5">
-                <span className="text-base text-neutral-500 font-normal">registered</span>
-                <span className="text-xs text-neutral-400">of 1,000 target</span>
-              </div>
-            </div>
-            <div className="w-full h-[3px] bg-neutral-100 rounded-full">
-              <div className="h-full rounded-full" style={{ width: '61.2%', backgroundColor: '#012030' }} />
-            </div>
-            <div className="flex items-center divide-x divide-neutral-100">
-              <span className="pr-6 text-sm text-neutral-500"><strong className="font-semibold text-neutral-900">61%</strong> to goal</span>
-              <span className="px-6 text-sm text-neutral-500"><strong className="font-semibold text-neutral-900">€183,600</strong> raised</span>
-              <span className="pl-6 text-sm text-neutral-500"><strong className="font-semibold" style={{ color: '#13678A' }}>3 days</strong> of early-bird left</span>
-            </div>
-          </section>
-          <hr className="border-t border-neutral-100" />
-          <section className="flex flex-col gap-3">
-            <h3 className="text-xs font-semibold text-neutral-400 uppercase tracking-widest">Registration momentum</h3>
-            <div className="relative mt-2">
-              <div className="absolute z-10 pointer-events-none" style={{ left: 'calc(76% - 32px)', top: '-2px' }}>
-                <div className="bg-neutral-900 text-white text-[10px] font-semibold px-2.5 py-1 rounded-full whitespace-nowrap">+27% peak</div>
-                <div className="w-px h-3 bg-neutral-300 mx-auto mt-0.5" />
-              </div>
-              <ResponsiveContainer width="100%" height={150}>
-                <AreaChart data={weeklyData} margin={{ top: 20, right: 4, left: -20, bottom: 0 }}>
-                  <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#a3a3a3', fontFamily: 'inherit' }} dy={6} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#a3a3a3', fontFamily: 'inherit' }} tickCount={4} width={36} />
-                  <ReferenceLine x="Mar 24" stroke="#e5e5e5" strokeWidth={1} strokeDasharray="3 3" />
-                  <Area type="monotone" dataKey="count" stroke="#012030" strokeWidth={1.5} fill="#45C4B0" fillOpacity={0.12} dot={false} activeDot={{ r: 3, fill: '#012030', strokeWidth: 0 }} />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-            <p className="text-[11px] text-neutral-400">Velocity accelerating — Mar 24 was your strongest week · Current week (Apr 1) is partial</p>
-          </section>
-          <hr className="border-t border-neutral-100" />
-          <section className="flex flex-col gap-5">
-            <div>
-              <h3 className="text-xs font-semibold text-neutral-400 uppercase tracking-widest">Ticket tier fill rate</h3>
-              <p className="text-[11px] text-neutral-400 mt-1">Registered vs. capacity per tier</p>
-            </div>
-            <div className="grid grid-cols-3 gap-8">
-              {ticketTiers.map(tier => {
-                const pct = Math.round((tier.registered / tier.capacity) * 100);
-                return (
-                  <div key={tier.tier} className="flex flex-col gap-3 relative">
-                    {tier.tier === 'Early-bird' && (
-                      <span className="absolute -top-2 right-0 text-[9px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap" style={{ backgroundColor: '#e8f6f8', border: '1px solid #13678A', color: '#012030' }}>Closes in 3 days</span>
-                    )}
-                    <span className="text-xs font-semibold text-neutral-700">{tier.tier}</span>
-                    <div className="w-full h-[5px] bg-neutral-100 rounded-full overflow-hidden">
-                      <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: tier.color }} />
-                    </div>
-                    <div className="flex items-baseline justify-between">
-                      <span className="text-xl font-semibold text-neutral-900 tabular-nums leading-none">{pct}%</span>
-                      <span className="text-[10px] text-neutral-400">{tier.registered} / {tier.capacity}</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-          <hr className="border-t border-neutral-100" />
-          <section className="flex flex-col gap-5">
-            <div>
-              <h3 className="text-xs font-semibold text-neutral-400 uppercase tracking-widest">Revenue scenarios</h3>
-              <p className="text-[11px] text-neutral-400 mt-1">Based on €300 average ticket price</p>
-            </div>
-            <div className="flex flex-col gap-7 pt-1">
-              {revenueScenarios.map(s => {
-                const pct = (s.value / 312000) * 100;
-                return (
-                  <div key={s.label} className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-neutral-500">{s.label}</span>
-                      <span className="text-sm font-semibold text-neutral-900 tabular-nums">€{(s.value / 1000).toFixed(0)}K</span>
-                    </div>
-                    <div className="relative w-full h-[1px] bg-neutral-100">
-                      <div className="absolute top-0 left-0 h-[1px]" style={{ width: `${pct}%`, backgroundColor: s.accent === '#E5E5E5' ? '#d4d4d4' : s.accent }} />
-                      <div className="absolute top-1/2 -translate-y-1/2 w-[8px] h-[8px] rounded-full border-2 border-white"
-                        style={{ left: `calc(${Math.min(pct, 98)}% - 4px)`, backgroundColor: s.accent === '#E5E5E5' ? '#d4d4d4' : s.accent }} />
-                    </div>
-                  </div>
-                );
-              })}
-              <div className="flex justify-between pt-1">
-                <span className="text-[10px] text-neutral-300">€0</span>
-                <span className="text-[10px] text-neutral-300">€312K full target</span>
-              </div>
-            </div>
-          </section>
-        </div>
-      )}
+      <Tabs
+        activeKey={rightTab}
+        onChange={key => onTabChange(key as 'report' | 'draft')}
+        items={[
+          { key: 'report', label: 'Insight Report', children: reportContent },
+          { key: 'draft', label: 'Exec Summary', children: draftContent },
+        ]}
+        tabBarStyle={{ paddingLeft: 40, paddingRight: 40, marginBottom: 0, borderBottom: '1px solid #f5f5f5' }}
+        style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
+        className="insights-tabs"
+      />
     </div>
   );
 }
@@ -526,6 +570,12 @@ function UnifiedChatView({ initialAgent, onBack }: { initialAgent: AgentId; onBa
     insights: '#10B981',
   };
 
+  const agentTagColor: Record<AgentId, string> = {
+    website:  '#7a7000',
+    contacts: '#1d4ed8',
+    insights: '#047857',
+  };
+
   const renderMessage = (msg: ChatMessage, i: number) => {
     if (msg.kind === 'user') {
       return (
@@ -548,17 +598,35 @@ function UnifiedChatView({ initialAgent, onBack }: { initialAgent: AgentId; onBa
           <div className="flex flex-col gap-2">
             <div className="flex items-baseline gap-2">
               <span className="text-sm font-semibold text-neutral-900">Soham</span>
-              <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full" style={{ backgroundColor: agentAvatarColor[msg.agentId] + '22', color: msg.agentId === 'website' ? '#7a7000' : msg.agentId === 'contacts' ? '#1d4ed8' : '#047857' }}>{agent.sub}</span>
+              <Tag
+                style={{
+                  backgroundColor: agentAvatarColor[msg.agentId] + '22',
+                  color: agentTagColor[msg.agentId],
+                  borderColor: 'transparent',
+                  fontSize: 10,
+                  fontWeight: 500,
+                  lineHeight: '18px',
+                }}
+              >
+                {agent.sub}
+              </Tag>
               <span className="text-xs text-neutral-400">{msg.time}</span>
             </div>
             {msg.text && <p className="text-sm text-neutral-700 leading-relaxed">{msg.text}</p>}
             {msg.actions && (
               <div className="flex gap-2 flex-wrap">
                 {msg.actions.map(a => (
-                  <button key={a.id} onClick={() => handleAction(a.id)}
-                    className={`px-5 py-2 rounded-full text-sm font-semibold transition-all cursor-pointer ${a.primary ? 'bg-[#FFF000] text-neutral-900 hover:brightness-95' : 'bg-neutral-50 text-neutral-700 hover:bg-neutral-100'}`}>
+                  <Button
+                    key={a.id}
+                    shape="round"
+                    onClick={() => handleAction(a.id)}
+                    style={a.primary
+                      ? { backgroundColor: '#FFF000', borderColor: '#FFF000', color: '#171717', fontWeight: 600 }
+                      : { backgroundColor: '#f5f5f5', borderColor: 'transparent', color: '#404040', fontWeight: 600 }
+                    }
+                  >
                     {a.label}
-                  </button>
+                  </Button>
                 ))}
               </div>
             )}
@@ -631,10 +699,12 @@ function UnifiedChatView({ initialAgent, onBack }: { initialAgent: AgentId; onBa
         <header className="flex items-center gap-3 px-6 py-5 border-b border-neutral-100 shrink-0 relative">
           <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-sm transition-colors duration-300"
             style={{ backgroundColor: agentAvatarColor[activeAgent] === '#FFF000' ? '#FFF000' : agentAvatarColor[activeAgent] }} />
-          <button onClick={onBack}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-neutral-50 transition-colors text-neutral-400 hover:text-neutral-700 shrink-0">
-            <ChevronLeft className="w-4 h-4" />
-          </button>
+          <Button
+            type="text"
+            onClick={onBack}
+            icon={<ChevronLeft className="w-4 h-4" />}
+            style={{ width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, color: '#a3a3a3', flexShrink: 0 }}
+          />
           <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: agentAvatarColor[activeAgent] + '22' }}>
             <img src={agentInfo.icon} className="w-4 h-4 object-contain" />
           </div>
@@ -772,10 +842,14 @@ export default function App() {
             <Ticket className="w-4 h-4 text-neutral-400 shrink-0" />
             <span className={`whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>Contact & tickets</span>
           </a>
-          <button className="flex items-center gap-2 px-3 py-2.5 rounded-md w-full text-neutral-400 text-sm hover:bg-neutral-50 hover:text-neutral-600 transition-colors">
-            <Plus className="w-4 h-4 shrink-0" />
+          <Button
+            type="text"
+            icon={<Plus className="w-4 h-4" />}
+            className={`flex items-center gap-2 px-3 w-full justify-start text-neutral-400 text-sm transition-colors`}
+            style={{ height: 40, paddingLeft: 12, borderRadius: 6 }}
+          >
             <span className={`whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>Create a new agent</span>
-          </button>
+          </Button>
         </nav>
 
         <div className="w-full px-2 my-3">
@@ -804,20 +878,20 @@ export default function App() {
               ))}
             </>
           )}
-          <button className="flex items-center gap-2 px-3 py-2.5 rounded-md w-full text-neutral-400 text-sm hover:bg-neutral-50 hover:text-neutral-600 transition-colors">
-            <Plus className="w-4 h-4 shrink-0" />
+          <Button
+            type="text"
+            icon={<Plus className="w-4 h-4" />}
+            className="flex items-center gap-2 px-3 w-full justify-start text-neutral-400 text-sm transition-colors"
+            style={{ height: 40, paddingLeft: 12, borderRadius: 6 }}
+          >
             <span className={`whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>Create a new chat</span>
-          </button>
+          </Button>
         </div>
 
         <div className="mt-auto flex flex-col items-center gap-3">
-          <div className="w-10 h-10 rounded-full overflow-hidden relative shadow-sm shrink-0">
-            <img src={imgProfile} alt="User Profile" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-auto max-w-none" />
-          </div>
+          <Avatar src={imgProfile} size={40} style={{ flexShrink: 0, cursor: 'pointer' }} />
           {!collapsed && (
-            <button className="text-neutral-700 p-1">
-              <MoreHorizontal className="w-5 h-5" />
-            </button>
+            <Button type="text" icon={<MoreHorizontal className="w-5 h-5" />} style={{ color: '#404040', padding: 4 }} />
           )}
         </div>
       </aside>
@@ -840,10 +914,9 @@ export default function App() {
 
             {/* Header / Notifications */}
             <header className="absolute top-6 right-6 flex items-center gap-3 z-20 cursor-pointer">
-              <div className="relative">
+              <Badge count={8} style={{ backgroundColor: '#dbeafe', color: '#2563eb', boxShadow: '0 0 0 2px white', fontSize: 10, fontWeight: 600 }}>
                 <Bell className="w-5 h-5 text-neutral-700" />
-                <div className="absolute -top-1.5 -right-1.5 bg-blue-100 text-blue-600 text-[10px] font-semibold flex items-center justify-center w-5 h-5 rounded-full border-2 border-white">8</div>
-              </div>
+              </Badge>
               <span className="font-medium text-sm text-neutral-700">New notifications</span>
             </header>
 
