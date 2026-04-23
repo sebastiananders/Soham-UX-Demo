@@ -947,30 +947,19 @@ export default function App() {
             {/* Recent Chats */}
             <div className="mt-[80px] z-10 w-full max-w-[820px] px-4 mb-20">
               <p className="text-xs font-medium text-neutral-400 mb-3 px-1">Recent chats</p>
-              <div className="bg-white rounded-2xl border border-neutral-100 shadow-[0_1px_6px_0_rgba(0,0,0,0.04)] overflow-hidden">
+              <div className="flex flex-col gap-2">
                 {([
-                  { id: 'insights' as AgentId, icon: regInsightIcon, title: 'Registration insight', sub: 'Insights & reporting', awaiting: 'Share the report or draft exec summary?' },
-                  { id: 'website' as AgentId, icon: speakerIcon, title: 'Speaker profiles', sub: 'Event website', awaiting: 'Your reply needed to continue' },
-                  { id: 'contacts' as AgentId, icon: warmContactsIcon, title: 'Win warm contacts', sub: 'Contact & tickets', awaiting: null },
-                ]).map((chat, i, arr) => (
+                  { id: 'insights' as AgentId, title: 'Registration insight', status: 'Awaiting reply', awaiting: true, source: 'Insights & reporting', time: '2h' },
+                  { id: 'website' as AgentId, title: 'Speaker profiles', status: 'Awaiting reply', awaiting: true, source: 'Event website', time: '1d' },
+                  { id: 'contacts' as AgentId, title: 'Win warm contacts', status: 'Active', awaiting: false, source: 'Contact & tickets', time: '3d' },
+                ]).map(chat => (
                   <div key={chat.id} onClick={() => openAgent(chat.id)}
-                    className={`flex items-center gap-4 px-5 py-4 cursor-pointer hover:bg-neutral-50 transition-colors${i < arr.length - 1 ? ' border-b border-neutral-100' : ''}`}>
-                    <div className="relative w-8 h-8 shrink-0">
-                      <div className="w-8 h-8 rounded-full bg-neutral-50 flex items-center justify-center">
-                        <img src={chat.icon} className="w-4 h-4 object-contain" />
-                      </div>
-                      {chat.awaiting && (
-                        <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-amber-400 border-2 border-white" />
-                      )}
-                    </div>
-                    <div className="flex flex-col flex-1 min-w-0">
-                      <span className="text-sm font-medium text-neutral-900">{chat.title}</span>
-                      {chat.awaiting ? (
-                        <span className="text-xs text-amber-500 mt-0.5 truncate">{chat.awaiting}</span>
-                      ) : (
-                        <span className="text-xs text-neutral-400 mt-0.5">{chat.sub}</span>
-                      )}
-                    </div>
+                    className="flex items-center gap-3 px-4 py-3.5 bg-neutral-50 rounded-xl cursor-pointer hover:bg-neutral-100 transition-colors">
+                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${chat.awaiting ? 'bg-amber-400' : 'bg-neutral-300'}`} />
+                    <span className={`text-sm shrink-0 ${chat.awaiting ? 'text-amber-500' : 'text-neutral-400'}`}>{chat.status}</span>
+                    <span className="text-sm font-semibold text-neutral-900 flex-1 min-w-0 truncate">{chat.title}</span>
+                    <span className="text-sm text-neutral-400 shrink-0">{chat.source}</span>
+                    <span className="text-sm text-neutral-400 shrink-0 w-6 text-right">{chat.time}</span>
                     <ChevronRight className="w-4 h-4 text-neutral-300 shrink-0" />
                   </div>
                 ))}
