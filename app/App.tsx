@@ -949,15 +949,15 @@ export default function App() {
               <p className="text-xs font-medium text-neutral-400 mb-3 px-1">Recent chats</p>
               <div className="flex flex-col gap-2">
                 {([
-                  { id: 'insights' as AgentId, title: 'Registration insight', status: 'Awaiting reply', awaiting: true, source: 'Insights & reporting', time: '2h' },
-                  { id: 'website' as AgentId, title: 'Speaker profiles', status: 'Awaiting reply', awaiting: true, source: 'Event website', time: '1d' },
-                  { id: 'contacts' as AgentId, title: 'Win warm contacts', status: 'Active', awaiting: false, source: 'Contact & tickets', time: '3d' },
+                  { id: 'insights' as AgentId, label: 'Want me to share this report with the team, or draft a summary for the exec update?', status: 'Awaiting reply', awaiting: true, source: 'Registration insight', time: '2h' },
+                  { id: 'website' as AgentId, label: 'Should I add the speaker section to the live page, or keep it as a draft?', status: 'Awaiting reply', awaiting: true, source: 'Speaker profiles', time: '1d' },
+                  { id: 'contacts' as AgentId, label: 'Win warm contacts', status: 'Active', awaiting: false, source: 'Contact & tickets', time: '3d' },
                 ]).map(chat => (
                   <div key={chat.id} onClick={() => openAgent(chat.id)}
                     className="flex items-center gap-3 px-4 py-3.5 bg-neutral-50 rounded-xl cursor-pointer hover:bg-neutral-100 transition-colors">
                     <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${chat.awaiting ? 'bg-blue-500 animate-pulse' : 'bg-neutral-300'}`} />
                     <span className={`text-sm shrink-0 ${chat.awaiting ? 'text-blue-500' : 'text-neutral-400'}`}>{chat.status}</span>
-                    <span className="text-sm font-semibold text-neutral-900 flex-1 min-w-0 truncate">{chat.title}</span>
+                    <span className="text-sm font-semibold text-neutral-900 flex-1 min-w-0 truncate">{chat.label}</span>
                     <span className="text-sm text-neutral-400 shrink-0">{chat.source}</span>
                     <span className="text-sm text-neutral-400 shrink-0 w-6 text-right">{chat.time}</span>
                     <ChevronRight className="w-4 h-4 text-neutral-300 shrink-0" />
