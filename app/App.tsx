@@ -955,11 +955,11 @@ export default function App() {
                 ]).map(chat => (
                   <div key={chat.id} onClick={() => openAgent(chat.id)}
                     className="flex items-center gap-3 px-4 py-3.5 bg-neutral-50 rounded-xl cursor-pointer hover:bg-neutral-100 transition-colors">
-                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${chat.awaiting ? 'bg-blue-500 animate-pulse' : 'bg-neutral-300'}`} />
-                    <span className={`text-sm shrink-0 ${chat.awaiting ? 'text-blue-500' : 'text-neutral-400'}`}>{chat.status}</span>
-                    <span className="text-sm font-semibold text-neutral-900 flex-1 min-w-0 truncate">{chat.label}</span>
-                    <span className="text-sm text-neutral-400 shrink-0">{chat.source}</span>
-                    <span className="text-sm text-neutral-400 shrink-0 w-6 text-right">{chat.time}</span>
+                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 self-start mt-[7px] ${chat.awaiting ? 'bg-blue-500 animate-pulse' : 'bg-neutral-300'}`} />
+                    <div className="flex flex-col flex-1 min-w-0">
+                      <span className="text-sm font-semibold text-neutral-900 truncate">{chat.label}</span>
+                      <span className="text-xs text-neutral-400 mt-0.5">{chat.status} · {chat.source} · {chat.time}</span>
+                    </div>
                     <ChevronRight className="w-4 h-4 text-neutral-300 shrink-0" />
                   </div>
                 ))}
