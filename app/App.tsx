@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Home, PieChart, Globe, Ticket, Bell, TrendingUp, AlertCircle, Plus, Mic, Paperclip, MoreHorizontal, ChevronLeft, X, ArrowUp, MessageSquare, Check } from 'lucide-react';
+import { Home, PieChart, Globe, Ticket, Bell, TrendingUp, AlertCircle, Plus, Mic, Paperclip, MoreHorizontal, ChevronLeft, ChevronRight, X, ArrowUp, MessageSquare, Check } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, ReferenceLine, ResponsiveContainer } from 'recharts';
 import { Button, Tag, Badge, Avatar, Tabs, Table } from 'antd';
 import type { TableProps } from 'antd';
@@ -866,7 +866,7 @@ export default function App() {
             </div>
 
             {/* Background lower half */}
-            <div className="absolute bg-neutral-50 h-[192px] w-[823px] left-1/2 -translate-x-1/2 top-[556px] rounded-[14px] -z-10" />
+            <div className="absolute bg-neutral-50 h-[260px] w-[823px] left-1/2 -translate-x-1/2 top-[530px] rounded-[14px] -z-10" />
 
             {/* Header / Notifications */}
             <header className="absolute top-6 right-6 flex items-center gap-3 z-20 cursor-pointer">
@@ -944,28 +944,28 @@ export default function App() {
               </div>
             </div>
 
-            {/* Agent Cards */}
-            <div className="mt-[120px] flex gap-3 z-10 w-full max-w-[820px] justify-center px-4 mb-20">
-              {([
-                { id: 'website' as AgentId, icon: speakerIcon, title: 'Speaker profiles', desc: 'Your event page is missing a speaker. Soham has drafted bio content and a layout section ready for review', badge: 'Event website agent', badgeIcon: <Globe className="w-3.5 h-3.5 text-neutral-400 shrink-0" /> },
-                { id: 'contacts' as AgentId, icon: warmContactsIcon, title: 'Win warm contacts', desc: "Draft a last-chance early-bird email to 340 warm contacts who opened the invite but haven't registered.", badge: 'Contact & tickets agent', badgeIcon: <Ticket className="w-3.5 h-3.5 text-neutral-400 shrink-0" /> },
-                { id: 'insights' as AgentId, icon: regInsightIcon, title: 'Registration insight', desc: 'Gathered recent data about the 612 participants and a first insights into the revenue projection', badge: 'Insights & reporting agent', badgeIcon: <PieChart className="w-3.5 h-3.5 text-neutral-400 shrink-0" /> },
-              ]).map(card => (
-                <div key={card.id} onClick={() => openAgent(card.id)}
-                  className="bg-white p-6 rounded-[0.85175rem] flex flex-col gap-2 w-[254px] shadow-[0_1.136px_9.085px_0_rgba(0,0,0,0.05)] hover:shadow-[0px_4px_16px_0px_rgba(0,0,0,0.10)] border-[1.136px] border-[#ECEAEA] shrink-0 cursor-pointer transition-shadow duration-150">
-                  <div className="flex items-center gap-3">
-                    <div className="w-[25px] h-[25px] flex items-center justify-center shrink-0">
-                      <img src={card.icon} className="w-full h-full object-contain" />
+            {/* Recent Chats */}
+            <div className="mt-[80px] z-10 w-full max-w-[820px] px-4 mb-20">
+              <p className="text-xs font-medium text-neutral-400 mb-3 px-1">Recent chats</p>
+              <div className="bg-white rounded-2xl border border-neutral-100 shadow-[0_1px_6px_0_rgba(0,0,0,0.04)] overflow-hidden">
+                {([
+                  { id: 'insights' as AgentId, icon: regInsightIcon, title: 'Registration insight', sub: 'Insights & reporting' },
+                  { id: 'website' as AgentId, icon: speakerIcon, title: 'Speaker profiles', sub: 'Event website' },
+                  { id: 'contacts' as AgentId, icon: warmContactsIcon, title: 'Win warm contacts', sub: 'Contact & tickets' },
+                ]).map((chat, i, arr) => (
+                  <div key={chat.id} onClick={() => openAgent(chat.id)}
+                    className={`flex items-center gap-4 px-5 py-4 cursor-pointer hover:bg-neutral-50 transition-colors${i < arr.length - 1 ? ' border-b border-neutral-100' : ''}`}>
+                    <div className="w-8 h-8 rounded-full bg-neutral-50 flex items-center justify-center shrink-0">
+                      <img src={chat.icon} className="w-4 h-4 object-contain" />
                     </div>
-                    <h3 className="font-semibold text-neutral-900 text-[15px] leading-tight">{card.title}</h3>
+                    <div className="flex flex-col flex-1 min-w-0">
+                      <span className="text-sm font-medium text-neutral-900">{chat.title}</span>
+                      <span className="text-xs text-neutral-400 mt-0.5">{chat.sub}</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-neutral-300 shrink-0" />
                   </div>
-                  <p className="text-[12px] text-neutral-500 leading-[1.6] flex-1">{card.desc}</p>
-                  <div className="flex items-center gap-1.5 pt-1 border-t border-neutral-50">
-                    {card.badgeIcon}
-                    <span className="text-[11px] text-neutral-400 font-medium">{card.badge}</span>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </>
         )}
