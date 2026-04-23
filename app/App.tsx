@@ -825,7 +825,7 @@ export default function App() {
 
         <nav className="flex flex-col w-full px-2 gap-2">
           <div className="px-3 py-1.5">
-            <span className={`text-xs font-medium text-neutral-400 whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>Agents</span>
+            <span className={`text-xs font-medium text-neutral-400 whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>Recent chats</span>
           </div>
           <a href="#" onClick={e => { e.preventDefault(); openAgent('insights'); }}
             className={`flex items-center gap-2 px-3 py-3 rounded-md w-full text-sm ${sidebarAgentActive('insights') ? 'bg-neutral-50 text-neutral-900 font-semibold' : 'text-neutral-700 hover:bg-neutral-50 transition-colors'}`}>
@@ -842,51 +842,7 @@ export default function App() {
             <Ticket className="w-4 h-4 text-neutral-400 shrink-0" />
             <span className={`whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>Contact & tickets</span>
           </a>
-          <Button
-            type="text"
-            icon={<Plus className="w-4 h-4" />}
-            className={`flex items-center gap-2 px-3 w-full justify-start text-neutral-400 text-sm transition-colors`}
-            style={{ height: 40, paddingLeft: 12, borderRadius: 6 }}
-          >
-            <span className={`whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>Create a new agent</span>
-          </Button>
         </nav>
-
-        <div className="w-full px-2 my-3">
-          <div className="h-px bg-neutral-100" />
-        </div>
-
-        {/* Recent chats — dynamic */}
-        <div className="flex flex-col w-full px-2 gap-1">
-          <div className="px-3 py-1.5">
-            <span className={`text-xs font-medium text-neutral-400 whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>Recent</span>
-          </div>
-          {chatHistory.map(item => (
-            <a key={item.id} href="#" onClick={e => { e.preventDefault(); openAgent(item.agentId); }}
-              className="flex items-center gap-2 px-3 py-2.5 rounded-md w-full text-neutral-600 text-sm hover:bg-neutral-50 transition-colors">
-              <MessageSquare className="w-4 h-4 text-neutral-400 shrink-0" />
-              <span className={`truncate whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>{item.title}</span>
-            </a>
-          ))}
-          {chatHistory.length === 0 && (
-            <>
-              {['Generate a schedule analysis…', 'Win warm contacts email', 'Speaker profile copy review', 'Revenue projection Q2'].map((title, i) => (
-                <a key={i} href="#" className="flex items-center gap-2 px-3 py-2.5 rounded-md w-full text-neutral-600 text-sm hover:bg-neutral-50 transition-colors">
-                  <MessageSquare className="w-4 h-4 text-neutral-400 shrink-0" />
-                  <span className={`truncate whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>{title}</span>
-                </a>
-              ))}
-            </>
-          )}
-          <Button
-            type="text"
-            icon={<Plus className="w-4 h-4" />}
-            className="flex items-center gap-2 px-3 w-full justify-start text-neutral-400 text-sm transition-colors"
-            style={{ height: 40, paddingLeft: 12, borderRadius: 6 }}
-          >
-            <span className={`whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>Create a new chat</span>
-          </Button>
-        </div>
 
         <div className="mt-auto flex flex-col items-center gap-3">
           <Avatar src={imgProfile} size={40} style={{ flexShrink: 0, cursor: 'pointer' }} />
