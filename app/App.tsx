@@ -27,10 +27,10 @@ interface HistoryItem { id: string; agentId: AgentId; title: string; preview: st
 
 // ── Agent config ───────────────────────────────────────────────────────────────
 
-const AGENTS: Record<AgentId, { name: string; sub: string; accent: string; icon: string }> = {
-  website:  { name: 'Speaker profiles',     sub: 'Event website',        accent: '#FFF000', icon: speakerIcon },
-  contacts: { name: 'Win warm contacts',    sub: 'Contact & tickets',    accent: '#3B82F6', icon: warmContactsIcon },
-  insights: { name: 'Registration insight', sub: 'Insights & reporting', accent: '#10B981', icon: regInsightIcon },
+const AGENTS: Record<AgentId, { name: string; sub: string; accent: string; icon: string; agentName: string }> = {
+  website:  { name: 'Speaker profiles',     sub: 'Event website',        accent: '#FFF000', icon: speakerIcon,        agentName: 'Nova' },
+  contacts: { name: 'Win warm contacts',    sub: 'Contact & tickets',    accent: '#3B82F6', icon: warmContactsIcon,   agentName: 'Leo'  },
+  insights: { name: 'Registration insight', sub: 'Insights & reporting', accent: '#10B981', icon: regInsightIcon,     agentName: 'Aria' },
 };
 
 const INITIAL_MESSAGES: Record<AgentId, ChatMessage[]> = {
@@ -597,7 +597,7 @@ function UnifiedChatView({ initialAgent, onBack }: { initialAgent: AgentId; onBa
           </div>
           <div className="flex flex-col gap-2">
             <div className="flex items-baseline gap-2">
-              <span className="text-sm font-semibold text-neutral-900">Soham</span>
+              <span className="text-sm font-semibold text-neutral-900">{agent.agentName}</span>
               <Tag
                 style={{
                   backgroundColor: agentAvatarColor[msg.agentId] + '22',
@@ -731,7 +731,7 @@ function UnifiedChatView({ initialAgent, onBack }: { initialAgent: AgentId; onBa
               value={inputValue}
               onChange={e => setInputValue(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSend()}
-              placeholder="Reply to Soham…"
+              placeholder={`Reply to ${AGENTS[activeAgent].agentName}…`}
               className="flex-1 bg-transparent border-none outline-none text-[15px] text-neutral-900 placeholder:text-neutral-400"
             />
             <div className="flex items-center gap-2 shrink-0">
