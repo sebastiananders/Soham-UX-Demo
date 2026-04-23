@@ -779,8 +779,14 @@ export default function App() {
   const [chatHistory, setChatHistory] = useState<HistoryItem[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handlePillClick = (text: string, index: number) => {
-    setInputValue(text);
+  const pillSuggestions = [
+    { label: 'Create a new ticket category', full: 'Create a new ticket category for group registrations with a 10% discount for teams of 5 or more.' },
+    { label: 'List all VIP registrations', full: 'List all VIP registrations for Tech Summit Europe 2026, including name, company, and contact details.' },
+    { label: 'Add a section to event website', full: 'Add a section to the event website showcasing our keynote speakers with their bios and session details.' },
+  ];
+
+  const handlePillClick = (full: string, index: number) => {
+    setInputValue(full);
     setHiddenPills(prev => new Set(prev).add(index));
     setInputFocused(true);
     inputRef.current?.focus();
@@ -923,18 +929,22 @@ export default function App() {
             {/* Bottom block — input pinned to bottom */}
             <div className="w-full max-w-[820px] pb-10 flex flex-col items-center gap-4 z-10 relative px-4">
               {/* Prompt Suggestions */}
-              <div className="flex flex-wrap items-center justify-center gap-2">
-                {['Create a new ticket category', 'List all VIP registrations', 'Add a section to event website'].map((text, i) => (
-                  <button key={i} onClick={() => handlePillClick(text, i)}
+              <div className="flex flex-wrap items-center justify-center gap-2"
+                style={{ opacity: inputFocused ? 0 : 1, pointerEvents: inputFocused ? 'none' : 'auto', transition: 'opacity 0.25s ease' }}>
+                {pillSuggestions.map((p, i) => (
+                  <button key={i} onClick={() => handlePillClick(p.full, i)}
                     style={{ maxWidth: hiddenPills.has(i) ? '0' : '320px', opacity: hiddenPills.has(i) ? 0 : 1, paddingLeft: hiddenPills.has(i) ? 0 : undefined, paddingRight: hiddenPills.has(i) ? 0 : undefined, overflow: 'hidden', transition: 'max-width 0.35s ease, opacity 0.2s ease, padding 0.35s ease' }}
                     className="px-5 py-2 bg-neutral-50 rounded-full text-sm font-normal text-neutral-700 hover:bg-white transition-colors whitespace-nowrap cursor-pointer">
-                    {text}
+                    {p.label}
                   </button>
                 ))}
               </div>
 
-              <div className="flex items-center gap-3">
-                <div className="w-[600px] h-[57px] bg-white rounded-[28.5px] shadow-[0px_2px_8px_0px_rgba(23,23,23,0.1)] flex items-center px-[20px] gap-3">
+              <div className="flex items-center justify-center gap-3 w-full">
+                <div
+                  className={`bg-white rounded-[28.5px] shadow-[0px_2px_8px_0px_rgba(23,23,23,0.1)] flex px-[20px] gap-3 ${inputFocused ? 'items-start pt-4' : 'items-center'}`}
+                  style={{ width: inputFocused ? '100%' : '600px', height: inputFocused ? '114px' : '57px', transition: 'width 0.35s cubic-bezier(0.4,0,0.2,1), height 0.35s cubic-bezier(0.4,0,0.2,1)' }}
+                >
                   <div className="w-6 h-6 rounded-full bg-neutral-100 flex items-center justify-center shrink-0">
                     <Plus className="w-3.5 h-3.5 text-neutral-500" />
                   </div>
@@ -956,7 +966,7 @@ export default function App() {
                   </div>
                   <div className="flex items-center gap-3 text-neutral-400 shrink-0">
                     {inputValue && (
-                      <button onClick={() => { setInputValue(''); setHiddenPills(new Set()); inputRef.current?.focus(); }} className="text-neutral-400 hover:text-neutral-600 transition-colors">
+                      <button onClick={() => { setInputValue(''); setHiddenPills(new Set()); setInputFocused(false); inputRef.current?.blur(); }} className="text-neutral-400 hover:text-neutral-600 transition-colors">
                         <X className="w-4 h-4" />
                       </button>
                     )}
