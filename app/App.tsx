@@ -829,12 +829,18 @@ export default function App() {
           </div>
           <a href="#" onClick={e => { e.preventDefault(); openAgent('insights'); }}
             className={`flex items-center gap-2 px-3 py-3 rounded-md w-full text-sm ${sidebarAgentActive('insights') ? 'bg-neutral-50 text-neutral-900 font-semibold' : 'text-neutral-700 hover:bg-neutral-50 transition-colors'}`}>
-            <PieChart className="w-4 h-4 text-neutral-400 shrink-0" />
+            <div className="relative shrink-0">
+              <PieChart className="w-4 h-4 text-neutral-400" />
+              <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+            </div>
             <span className={`whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>Insights & reporting</span>
           </a>
           <a href="#" onClick={e => { e.preventDefault(); openAgent('website'); }}
             className={`flex items-center gap-2 px-3 py-3 rounded-md w-full text-sm ${sidebarAgentActive('website') ? 'bg-neutral-50 text-neutral-900 font-semibold' : 'text-neutral-700 hover:bg-neutral-50 transition-colors'}`}>
-            <Globe className="w-4 h-4 text-neutral-400 shrink-0" />
+            <div className="relative shrink-0">
+              <Globe className="w-4 h-4 text-neutral-400" />
+              <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+            </div>
             <span className={`whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>Event website</span>
           </a>
           <a href="#" onClick={e => { e.preventDefault(); openAgent('contacts'); }}
