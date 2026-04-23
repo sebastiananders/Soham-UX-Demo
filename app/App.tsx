@@ -9,6 +9,9 @@ import { Illustration } from './components/FigmaIcons';
 import speakerIcon from './assets/speaker.svg';
 import warmContactsIcon from './assets/warmcontacts.svg';
 import regInsightIcon from './assets/reginsight.svg';
+import imgNova from './assets/nova.jpg';
+import imgLeo from './assets/leo.jpg';
+import imgAria from './assets/aria.jpg';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -27,10 +30,10 @@ interface HistoryItem { id: string; agentId: AgentId; title: string; preview: st
 
 // ── Agent config ───────────────────────────────────────────────────────────────
 
-const AGENTS: Record<AgentId, { name: string; sub: string; accent: string; icon: string; agentName: string }> = {
-  website:  { name: 'Speaker profiles',     sub: 'Event website',        accent: '#FFF000', icon: speakerIcon,        agentName: 'Nova' },
-  contacts: { name: 'Win warm contacts',    sub: 'Contact & tickets',    accent: '#3B82F6', icon: warmContactsIcon,   agentName: 'Leo'  },
-  insights: { name: 'Registration insight', sub: 'Insights & reporting', accent: '#10B981', icon: regInsightIcon,     agentName: 'Aria' },
+const AGENTS: Record<AgentId, { name: string; sub: string; meta: string; accent: string; icon: string; agentName: string; photo: string }> = {
+  website:  { name: 'Speaker profiles',     sub: 'Event website',        meta: '1d ago · Draft ready',       accent: '#FFF000', icon: speakerIcon,      agentName: 'Nova', photo: imgNova },
+  contacts: { name: 'Win warm contacts',    sub: 'Contact & tickets',    meta: '3d ago · 340 warm contacts', accent: '#3B82F6', icon: warmContactsIcon, agentName: 'Leo',  photo: imgLeo  },
+  insights: { name: 'Registration insight', sub: 'Insights & reporting', meta: '2h ago · 612 registrations', accent: '#10B981', icon: regInsightIcon,   agentName: 'Aria', photo: imgAria },
 };
 
 const INITIAL_MESSAGES: Record<AgentId, ChatMessage[]> = {
@@ -592,9 +595,8 @@ function UnifiedChatView({ initialAgent, onBack }: { initialAgent: AgentId; onBa
       const agent = AGENTS[msg.agentId];
       return (
         <div key={i} className="flex gap-3">
-          <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5 overflow-hidden border border-neutral-100"
-            style={{ backgroundColor: agentAvatarColor[msg.agentId] + '22' }}>
-            <img src={agent.icon} className="w-4 h-4 object-contain" />
+          <div className="w-7 h-7 rounded-full shrink-0 mt-0.5 overflow-hidden border border-neutral-100">
+            <img src={agent.photo} className="w-full h-full object-cover" />
           </div>
           <div className="flex flex-col gap-2">
             <div className="flex items-baseline gap-2">
@@ -706,12 +708,9 @@ function UnifiedChatView({ initialAgent, onBack }: { initialAgent: AgentId; onBa
             icon={<ChevronLeft className="w-4 h-4" />}
             style={{ width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, color: '#a3a3a3', flexShrink: 0 }}
           />
-          <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: agentAvatarColor[activeAgent] + '22' }}>
-            <img src={agentInfo.icon} className="w-4 h-4 object-contain" />
-          </div>
           <div className="flex flex-col">
             <h2 className="font-semibold text-neutral-900 text-sm leading-tight">{agentInfo.name}</h2>
-            <span className="text-neutral-400 font-semibold text-[11px]">{agentInfo.sub}</span>
+            <span className="text-neutral-400 font-normal text-[11px]">{agentInfo.meta}</span>
           </div>
         </header>
 
@@ -834,27 +833,23 @@ export default function App() {
           <div className="px-3 py-1.5">
             <span className={`text-xs font-medium text-neutral-400 whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>Recent chats</span>
           </div>
-          <a href="#" onClick={e => { e.preventDefault(); openAgent('insights'); }}
-            className={`flex items-center gap-2 px-3 py-3 rounded-md w-full text-sm ${sidebarAgentActive('insights') ? 'bg-neutral-50 text-neutral-900 font-semibold' : 'text-neutral-700 hover:bg-neutral-50 transition-colors'}`}>
-            <div className="relative shrink-0">
-              <PieChart className="w-4 h-4 text-neutral-400" />
-              <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-            </div>
-            <span className={`whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>Insights & reporting</span>
-          </a>
-          <a href="#" onClick={e => { e.preventDefault(); openAgent('website'); }}
-            className={`flex items-center gap-2 px-3 py-3 rounded-md w-full text-sm ${sidebarAgentActive('website') ? 'bg-neutral-50 text-neutral-900 font-semibold' : 'text-neutral-700 hover:bg-neutral-50 transition-colors'}`}>
-            <div className="relative shrink-0">
-              <Globe className="w-4 h-4 text-neutral-400" />
-              <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-            </div>
-            <span className={`whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>Event website</span>
-          </a>
-          <a href="#" onClick={e => { e.preventDefault(); openAgent('contacts'); }}
-            className={`flex items-center gap-2 px-3 py-3 rounded-md w-full text-sm ${sidebarAgentActive('contacts') ? 'bg-neutral-50 text-neutral-900 font-semibold' : 'text-neutral-700 hover:bg-neutral-50 transition-colors'}`}>
-            <Ticket className="w-4 h-4 text-neutral-400 shrink-0" />
-            <span className={`whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>Contact & tickets</span>
-          </a>
+          {([
+            { id: 'insights' as AgentId, photo: imgAria, label: 'Insights & reporting', meta: '2h ago · 612 registrations', awaiting: true  },
+            { id: 'website'  as AgentId, photo: imgNova, label: 'Event website',         meta: '1d ago · Draft ready',       awaiting: true  },
+            { id: 'contacts' as AgentId, photo: imgLeo,  label: 'Contact & tickets',     meta: '3d ago · 340 warm contacts', awaiting: false },
+          ]).map(item => (
+            <a key={item.id} href="#" onClick={e => { e.preventDefault(); openAgent(item.id); }}
+              className={`flex items-center gap-2 px-3 py-2.5 rounded-md w-full text-sm ${sidebarAgentActive(item.id) ? 'bg-neutral-50 text-neutral-900 font-semibold' : 'text-neutral-700 hover:bg-neutral-50 transition-colors'}`}>
+              <div className="relative shrink-0">
+                <img src={item.photo} className="w-5 h-5 rounded-full object-cover" />
+                {item.awaiting && <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />}
+              </div>
+              <div className={`flex flex-col min-w-0 transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>
+                <span className="whitespace-nowrap text-sm">{item.label}</span>
+                <span className="whitespace-nowrap text-[10px] text-neutral-400 font-normal mt-0.5">{item.meta}</span>
+              </div>
+            </a>
+          ))}
         </nav>
 
         <div className="mt-auto flex flex-col items-center gap-3">
@@ -908,16 +903,16 @@ export default function App() {
                 <p className="text-xs font-medium text-neutral-400 mb-3 px-1">Recent chats</p>
                 <div className="flex flex-col gap-2">
                   {([
-                    { id: 'insights' as AgentId, label: 'Want me to share this report with the team, or draft a summary for the exec update?', status: 'Awaiting reply', awaiting: true, source: 'Registration insight', time: '2h' },
-                    { id: 'website' as AgentId, label: 'Should I add the speaker section to the live page, or keep it as a draft?', status: 'Awaiting reply', awaiting: true, source: 'Speaker profiles', time: '1d' },
-                    { id: 'contacts' as AgentId, label: 'Win warm contacts', status: 'Active', awaiting: false, source: 'Contact & tickets', time: '3d' },
+                    { id: 'insights' as AgentId, label: 'Want me to share this report with the team, or draft a summary for the exec update?', meta: 'Aria is awaiting your response · 2h ago', awaiting: true },
+                    { id: 'website'  as AgentId, label: 'Should I add the speaker section to the live page, or keep it as a draft?',           meta: 'Nova is awaiting your response · 1d ago', awaiting: true },
+                    { id: 'contacts' as AgentId, label: 'Win warm contacts',                                                                    meta: 'Leo · Last active 3d ago',               awaiting: false },
                   ]).map(chat => (
                     <div key={chat.id} onClick={() => openAgent(chat.id)}
                       className="flex items-center gap-3 px-4 py-3.5 bg-neutral-50 rounded-xl cursor-pointer hover:bg-neutral-100 transition-colors">
                       <span className={`w-1.5 h-1.5 rounded-full shrink-0 self-start mt-[7px] ${chat.awaiting ? 'bg-blue-500 animate-pulse' : 'bg-neutral-300'}`} />
                       <div className="flex flex-col flex-1 min-w-0">
                         <span className="text-sm font-medium text-neutral-900 truncate">{chat.label}</span>
-                        <span className="text-xs text-neutral-400 mt-0.5">{chat.status} · {chat.source} · {chat.time}</span>
+                        <span className="text-xs text-neutral-400 mt-0.5">{chat.meta}</span>
                       </div>
                       <ChevronRight className="w-4 h-4 text-neutral-300 shrink-0" />
                     </div>
