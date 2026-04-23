@@ -406,6 +406,7 @@ function InsightsCanvas({ loading, draftState, draftChosen, rightTab, onTabChang
       <Tabs
         activeKey={rightTab}
         onChange={key => onTabChange(key as 'report' | 'draft')}
+        destroyInactiveTabPane
         items={[
           { key: 'report', label: 'Insight Report', children: reportContent },
           { key: 'draft', label: 'Exec Summary', children: draftContent },
@@ -859,7 +860,7 @@ export default function App() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 relative flex flex-col items-center justify-center overflow-hidden">
+      <main className="flex-1 relative flex flex-col items-center overflow-hidden">
         {activeSession ? (
           <UnifiedChatView key={activeSession} initialAgent={activeSession} onBack={handleBack} />
         ) : (
@@ -871,9 +872,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* Background lower half */}
-            <div className="absolute bg-neutral-50 h-[260px] w-[823px] left-1/2 -translate-x-1/2 top-[530px] rounded-[14px] -z-10" />
-
             {/* Header / Notifications */}
             <header className="absolute top-6 right-6 flex items-center gap-3 z-20 cursor-pointer">
               <Badge count={8} style={{ backgroundColor: '#dbeafe', color: '#2563eb', boxShadow: '0 0 0 2px white', fontSize: 10, fontWeight: 600 }}>
@@ -882,11 +880,11 @@ export default function App() {
               <span className="font-medium text-sm text-neutral-700">New notifications</span>
             </header>
 
-            {/* Hero */}
-            <div className="w-full max-w-[820px] flex flex-col items-center gap-[30px] z-10 relative">
-              <div className="flex flex-col items-center gap-[12px] w-full">
-                <h1 className="font-serif text-[33px] text-neutral-900">Aloha, Jen</h1>
-                <div className="flex items-center justify-center gap-3 px-6 py-3">
+            {/* Top block — greeting + recent chats */}
+            <div className="flex-1 w-full max-w-[820px] flex flex-col items-center justify-center gap-8 z-10 relative px-4">
+              <div className="flex flex-col items-center gap-3 w-full">
+                <h1 className="text-[42px] text-neutral-900 tracking-tight" style={{ fontFamily: 'GalaxieCopernicus, serif' }}>Aloha, Jen</h1>
+                <div className="flex items-center justify-center gap-3 px-6 py-2">
                   <p className="flex items-center gap-1.5 text-sm text-neutral-700">
                     <TrendingUp className="w-4 h-4 text-emerald-500" />
                     <span>Registration is at 61% of target</span>
@@ -899,76 +897,77 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="flex flex-col items-center gap-[18px] relative w-full">
-                <div className="flex items-center gap-3">
-                  <div className="w-[600px] h-[57px] bg-white rounded-[28.5px] shadow-[0px_2px_8px_0px_rgba(23,23,23,0.1)] flex items-center px-[20px] gap-3">
-                    <div className="w-6 h-6 rounded-full bg-neutral-100 flex items-center justify-center shrink-0">
-                      <Plus className="w-3.5 h-3.5 text-neutral-500" />
+              {/* Recent Chats */}
+              <div className="w-full">
+                <p className="text-xs font-medium text-neutral-400 mb-3 px-1">Recent chats</p>
+                <div className="flex flex-col gap-2">
+                  {([
+                    { id: 'insights' as AgentId, label: 'Want me to share this report with the team, or draft a summary for the exec update?', status: 'Awaiting reply', awaiting: true, source: 'Registration insight', time: '2h' },
+                    { id: 'website' as AgentId, label: 'Should I add the speaker section to the live page, or keep it as a draft?', status: 'Awaiting reply', awaiting: true, source: 'Speaker profiles', time: '1d' },
+                    { id: 'contacts' as AgentId, label: 'Win warm contacts', status: 'Active', awaiting: false, source: 'Contact & tickets', time: '3d' },
+                  ]).map(chat => (
+                    <div key={chat.id} onClick={() => openAgent(chat.id)}
+                      className="flex items-center gap-3 px-4 py-3.5 bg-neutral-50 rounded-xl cursor-pointer hover:bg-neutral-100 transition-colors">
+                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 self-start mt-[7px] ${chat.awaiting ? 'bg-blue-500 animate-pulse' : 'bg-neutral-300'}`} />
+                      <div className="flex flex-col flex-1 min-w-0">
+                        <span className="text-sm font-medium text-neutral-900 truncate">{chat.label}</span>
+                        <span className="text-xs text-neutral-400 mt-0.5">{chat.status} · {chat.source} · {chat.time}</span>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-neutral-300 shrink-0" />
                     </div>
-                    <div className="relative flex-1">
-                      <input
-                        type="text"
-                        ref={inputRef}
-                        value={inputValue}
-                        onChange={e => { setInputValue(e.target.value); if (e.target.value === '') setHiddenPills(new Set()); }}
-                        onFocus={() => setInputFocused(true)}
-                        onBlur={() => setInputFocused(false)}
-                        className="w-full bg-transparent border-none outline-none text-[16px] text-neutral-900"
-                      />
-                      {!inputFocused && !inputValue && (
-                        <span className="absolute inset-0 flex items-center text-[16px] text-neutral-400 pointer-events-none">
-                          Generate a schedule analysis for Tech Summit Europe 2026
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-3 text-neutral-400 shrink-0">
-                      {inputValue && (
-                        <button onClick={() => { setInputValue(''); setHiddenPills(new Set()); inputRef.current?.focus(); }} className="text-neutral-400 hover:text-neutral-600 transition-colors">
-                          <X className="w-4 h-4" />
-                        </button>
-                      )}
-                      <Mic className="w-5 h-5 cursor-pointer hover:text-neutral-600 transition-colors" />
-                      <Paperclip className="w-5 h-5 cursor-pointer hover:text-neutral-600 transition-colors" />
-                    </div>
-                  </div>
-                  <button style={{ opacity: inputValue ? 1 : 0, transform: inputValue ? 'scale(1)' : 'scale(0.7)', pointerEvents: inputValue ? 'auto' : 'none', transition: 'opacity 0.2s ease, transform 0.2s ease' }}
-                    className="w-[57px] h-[57px] rounded-full bg-[#FFF000] flex items-center justify-center shrink-0 hover:brightness-95">
-                    <ArrowUp className="w-5 h-5 text-neutral-900 stroke-[2.5]" />
-                  </button>
-                </div>
-
-                {/* Prompt Suggestions */}
-                <div className="flex flex-wrap items-center justify-center gap-2">
-                  {['Create a new ticket category', 'List all VIP registrations', 'Add a section to event website'].map((text, i) => (
-                    <button key={i} onClick={() => handlePillClick(text, i)}
-                      style={{ maxWidth: hiddenPills.has(i) ? '0' : '320px', opacity: hiddenPills.has(i) ? 0 : 1, paddingLeft: hiddenPills.has(i) ? 0 : undefined, paddingRight: hiddenPills.has(i) ? 0 : undefined, overflow: 'hidden', transition: 'max-width 0.35s ease, opacity 0.2s ease, padding 0.35s ease' }}
-                      className="px-5 py-2 bg-neutral-50 rounded-full text-sm font-normal text-neutral-700 hover:bg-white transition-colors whitespace-nowrap cursor-pointer">
-                      {text}
-                    </button>
                   ))}
                 </div>
               </div>
             </div>
 
-            {/* Recent Chats */}
-            <div className="mt-[60px] z-10 w-full max-w-[820px] px-4">
-              <p className="text-xs font-medium text-neutral-400 mb-3 px-1">Recent chats</p>
-              <div className="flex flex-col gap-2">
-                {([
-                  { id: 'insights' as AgentId, label: 'Want me to share this report with the team, or draft a summary for the exec update?', status: 'Awaiting reply', awaiting: true, source: 'Registration insight', time: '2h' },
-                  { id: 'website' as AgentId, label: 'Should I add the speaker section to the live page, or keep it as a draft?', status: 'Awaiting reply', awaiting: true, source: 'Speaker profiles', time: '1d' },
-                  { id: 'contacts' as AgentId, label: 'Win warm contacts', status: 'Active', awaiting: false, source: 'Contact & tickets', time: '3d' },
-                ]).map(chat => (
-                  <div key={chat.id} onClick={() => openAgent(chat.id)}
-                    className="flex items-center gap-3 px-4 py-3.5 bg-neutral-50 rounded-xl cursor-pointer hover:bg-neutral-100 transition-colors">
-                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 self-start mt-[7px] ${chat.awaiting ? 'bg-blue-500 animate-pulse' : 'bg-neutral-300'}`} />
-                    <div className="flex flex-col flex-1 min-w-0">
-                      <span className="text-sm font-semibold text-neutral-900 truncate">{chat.label}</span>
-                      <span className="text-xs text-neutral-400 mt-0.5">{chat.status} · {chat.source} · {chat.time}</span>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-neutral-300 shrink-0" />
-                  </div>
+            {/* Bottom block — input pinned to bottom */}
+            <div className="w-full max-w-[820px] pb-10 flex flex-col items-center gap-4 z-10 relative px-4">
+              {/* Prompt Suggestions */}
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                {['Create a new ticket category', 'List all VIP registrations', 'Add a section to event website'].map((text, i) => (
+                  <button key={i} onClick={() => handlePillClick(text, i)}
+                    style={{ maxWidth: hiddenPills.has(i) ? '0' : '320px', opacity: hiddenPills.has(i) ? 0 : 1, paddingLeft: hiddenPills.has(i) ? 0 : undefined, paddingRight: hiddenPills.has(i) ? 0 : undefined, overflow: 'hidden', transition: 'max-width 0.35s ease, opacity 0.2s ease, padding 0.35s ease' }}
+                    className="px-5 py-2 bg-neutral-50 rounded-full text-sm font-normal text-neutral-700 hover:bg-white transition-colors whitespace-nowrap cursor-pointer">
+                    {text}
+                  </button>
                 ))}
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="w-[600px] h-[57px] bg-white rounded-[28.5px] shadow-[0px_2px_8px_0px_rgba(23,23,23,0.1)] flex items-center px-[20px] gap-3">
+                  <div className="w-6 h-6 rounded-full bg-neutral-100 flex items-center justify-center shrink-0">
+                    <Plus className="w-3.5 h-3.5 text-neutral-500" />
+                  </div>
+                  <div className="relative flex-1">
+                    <input
+                      type="text"
+                      ref={inputRef}
+                      value={inputValue}
+                      onChange={e => { setInputValue(e.target.value); if (e.target.value === '') setHiddenPills(new Set()); }}
+                      onFocus={() => setInputFocused(true)}
+                      onBlur={() => setInputFocused(false)}
+                      className="w-full bg-transparent border-none outline-none text-[16px] text-neutral-900"
+                    />
+                    {!inputFocused && !inputValue && (
+                      <span className="absolute inset-0 flex items-center text-[16px] text-neutral-400 pointer-events-none">
+                        Generate a schedule analysis for Tech Summit Europe 2026
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3 text-neutral-400 shrink-0">
+                    {inputValue && (
+                      <button onClick={() => { setInputValue(''); setHiddenPills(new Set()); inputRef.current?.focus(); }} className="text-neutral-400 hover:text-neutral-600 transition-colors">
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                    <Mic className="w-5 h-5 cursor-pointer hover:text-neutral-600 transition-colors" />
+                    <Paperclip className="w-5 h-5 cursor-pointer hover:text-neutral-600 transition-colors" />
+                  </div>
+                </div>
+                <button style={{ opacity: inputValue ? 1 : 0, width: inputValue ? '57px' : '0', transform: inputValue ? 'scale(1)' : 'scale(0.7)', pointerEvents: inputValue ? 'auto' : 'none', transition: 'opacity 0.2s ease, transform 0.2s ease, width 0.2s ease', overflow: 'hidden' }}
+                  className="h-[57px] rounded-full bg-[#FFF000] flex items-center justify-center shrink-0 hover:brightness-95">
+                  <ArrowUp className="w-5 h-5 text-neutral-900 stroke-[2.5]" />
+                </button>
               </div>
             </div>
           </>
