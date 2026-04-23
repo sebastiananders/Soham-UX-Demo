@@ -859,7 +859,7 @@ export default function App() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 relative flex flex-col items-center overflow-hidden">
+      <main className="flex-1 relative flex flex-col items-center justify-center overflow-hidden">
         {activeSession ? (
           <UnifiedChatView key={activeSession} initialAgent={activeSession} onBack={handleBack} />
         ) : (
@@ -883,7 +883,7 @@ export default function App() {
             </header>
 
             {/* Hero */}
-            <div className="w-full max-w-[820px] pt-[200px] flex flex-col items-center gap-[30px] z-10 relative">
+            <div className="w-full max-w-[820px] flex flex-col items-center gap-[30px] z-10 relative">
               <div className="flex flex-col items-center gap-[12px] w-full">
                 <h1 className="font-serif text-[33px] text-neutral-900">Aloha, Jen</h1>
                 <div className="flex items-center justify-center gap-3 px-6 py-3">
@@ -951,7 +951,7 @@ export default function App() {
             </div>
 
             {/* Recent Chats */}
-            <div className="mt-[80px] z-10 w-full max-w-[820px] px-4 mb-20">
+            <div className="mt-[60px] z-10 w-full max-w-[820px] px-4">
               <p className="text-xs font-medium text-neutral-400 mb-3 px-1">Recent chats</p>
               <div className="flex flex-col gap-2">
                 {([
