@@ -645,14 +645,10 @@ function UnifiedChatView({ initialAgent, onBack }: { initialAgent: AgentId; onBa
         <div key={i} className="flex items-center gap-3 py-2">
           <div className="flex-1 h-px bg-neutral-100" />
           <div className="flex items-center gap-2 shrink-0">
-            <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: agentAvatarColor[msg.from] + '33' }}>
-              <img src={fromAgent.icon} className="w-3 h-3 object-contain" />
-            </div>
+            <img src={fromAgent.photo} className="w-5 h-5 rounded-full object-cover" />
             <span className="text-[11px] text-neutral-400">→</span>
-            <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: agentAvatarColor[msg.to] + '33' }}>
-              <img src={toAgent.icon} className="w-3 h-3 object-contain" />
-            </div>
-            <span className="text-[11px] text-neutral-500 font-medium">Switching to {toAgent.sub}</span>
+            <img src={toAgent.photo} className="w-5 h-5 rounded-full object-cover" />
+            <span className="text-[11px] text-neutral-500 font-medium">Switching to {toAgent.agentName}</span>
           </div>
           <div className="flex-1 h-px bg-neutral-100" />
         </div>
