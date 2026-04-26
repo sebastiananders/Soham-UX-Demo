@@ -226,8 +226,8 @@ export default function App() {
             <div className="flex-1 w-full max-w-[820px] flex flex-col items-center justify-center gap-16 z-10 relative px-4">
               <div className="flex flex-col items-center gap-10 w-full">
                 <div className="flex flex-col items-center gap-1">
-                  <h1 className="text-[42px] text-neutral-900 tracking-tight" style={{ fontFamily: 'GalaxieCopernicus, serif' }}>Aloha, Jen</h1>
-                  <p className="text-base text-neutral-400">Let's get some work done</p>
+                  <h1 className="text-[42px] font-bold text-neutral-900 tracking-tight" style={{ fontFamily: 'GalaxieCopernicus, serif' }}>Aloha, Jen</h1>
+                  <p className="text-base text-neutral-400">Today is a good day &#9728;&#65039;</p>
                 </div>
                 <div className="flex items-center gap-4 w-full max-w-[600px] border border-neutral-200 rounded-2xl px-8 py-5">
                   <span className="text-sm text-neutral-400 whitespace-nowrap shrink-0 transition-opacity duration-200" style={{ opacity: progressAnimating ? 0 : 1 }}>
