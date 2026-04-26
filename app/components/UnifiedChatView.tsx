@@ -253,18 +253,17 @@ export function UnifiedChatView({ initialAgent, onBack }: { initialAgent: AgentI
     <div className="flex h-screen w-full">
       {/* ── Left: Chat panel ── */}
       <div className="w-[400px] shrink-0 flex flex-col border-r border-neutral-100">
-        <header className="flex items-center gap-3 px-6 py-5 border-b border-neutral-100 shrink-0 relative">
-          <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-sm transition-colors duration-300"
-            style={{ backgroundColor: AGENTS[activeAgent].accent }} />
+        <header className="flex items-center gap-3 px-6 py-5 border-b border-neutral-100 shrink-0 relative transition-colors duration-300"
+          style={{ backgroundColor: AGENTS[activeAgent].cardBg }}>
           <Button
             type="text"
             onClick={onBack}
-            icon={<ChevronLeft className="w-4 h-4" />}
-            style={{ width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, color: '#a3a3a3', flexShrink: 0 }}
+            icon={<ChevronLeft className="w-5 h-5" />}
+            style={{ width: 34, height: 34, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, color: 'rgba(0,0,0,0.5)', flexShrink: 0 }}
           />
-          <div className="flex flex-col">
-            <h2 className="font-semibold text-neutral-900 text-sm leading-tight">{agentInfo.name}</h2>
-            <span className="text-neutral-400 font-normal text-[11px]">{agentInfo.meta}</span>
+          <div className="flex flex-col gap-0.5">
+            <h2 className="font-bold text-[18px] leading-tight" style={{ color: '#171717' }}>{agentInfo.name}</h2>
+            <span className="text-[12px] font-medium" style={{ color: 'rgba(0,0,0,0.5)' }}>{agentInfo.meta}</span>
           </div>
         </header>
 

@@ -7,10 +7,11 @@ export const AGENTS: Record<AgentId, {
   sub: string;
   meta: string;
   accent: string;
+  cardBg: string;
 }> = {
-  website:  { name: 'Speaker profiles',     sub: 'Event website',        meta: '1d ago · Draft ready',       accent: '#F59E0B' },
-  contacts: { name: 'Win warm contacts',    sub: 'Contact & tickets',    meta: '3d ago · 340 warm contacts', accent: '#3B82F6' },
-  insights: { name: 'Registration insight', sub: 'Insights & reporting', meta: '2h ago · 612 registrations', accent: '#10B981' },
+  website:  { name: 'Speaker profiles',     sub: 'Event website',        meta: '1d ago · Draft ready',       accent: '#F59E0B', cardBg: '#FDE047' },
+  contacts: { name: 'Win warm contacts',    sub: 'Contact & tickets',    meta: '3d ago · 340 warm contacts', accent: '#3B82F6', cardBg: '#C4B5FD' },
+  insights: { name: 'Registration insight', sub: 'Insights & reporting', meta: '2h ago · 612 registrations', accent: '#10B981', cardBg: '#34D399' },
 };
 
 // ── Initial messages ───────────────────────────────────────────────────────────

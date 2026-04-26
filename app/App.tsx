@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Home, Globe, Ticket, PieChart, Bell, TrendingUp, AlertCircle, Plus, Mic, Paperclip, MoreHorizontal, ChevronRight, X, ArrowUp } from 'lucide-react';
+import { Home, Globe, Ticket, PieChart, Bell, Plus, Mic, Paperclip, MoreHorizontal, ChevronRight, X, ArrowUp, Bookmark, Shuffle } from 'lucide-react';
 import { Badge, Avatar } from 'antd';
 import imgLogo from "../imports/DeviceMacBookPro14/c4121c79ef3207dcf24c7435552bb7378ad17369.png";
 import imgProfile from "../imports/DeviceMacBookPro14/d48bb91af6b62d07c468e4d0ae99ca184be233a8.png";
@@ -8,6 +8,14 @@ import { UnifiedChatView } from './components/UnifiedChatView';
 import { AgentAvatar } from './components/AgentAvatar';
 import type { AgentId, HistoryItem } from '../types';
 import { AGENTS, INITIAL_MESSAGES } from '../constants';
+
+const PROGRESS_METRICS = [
+  { left: '612 of 1,000 seats',          pct: 61, right: '61%',  sub: '3 days left on early-bird' },
+  { left: '€183,600 of €300K revenue',   pct: 61, right: '61%',  sub: 'on current pace'           },
+  { left: '8 of 12 speakers confirmed',  pct: 67, right: '67%',  sub: '4 still pending'           },
+  { left: '5 of 8 sponsors signed',      pct: 63, right: '63%',  sub: '2 weeks to deadline'       },
+  { left: '127 of 400 early-bird seats', pct: 32, right: '32%',  sub: 'still available'           },
+];
 
 const ACTIVITY_ITEMS: { id: AgentId; label: string; meta: string; awaiting: boolean }[] = [
   { id: 'insights', label: 'Want me to share this report with the team, or draft a summary for the exec update?', meta: 'Insights & reporting · awaiting response · 2h ago', awaiting: true },
@@ -25,6 +33,17 @@ export default function App() {
   const [showActivity, setShowActivity] = useState(false);
   const [activeChatsOpen, setActiveChatsOpen] = useState(true);
   const [recentChatsOpen, setRecentChatsOpen] = useState(true);
+  const [bookmarked, setBookmarked] = useState<Set<AgentId>>(new Set());
+  const [progressIdx, setProgressIdx] = useState(0);
+  const [progressAnimating, setProgressAnimating] = useState(false);
+
+  const shuffleProgress = () => {
+    setProgressAnimating(true);
+    setTimeout(() => {
+      setProgressIdx(i => (i + 1 + Math.floor(Math.random() * (PROGRESS_METRICS.length - 1))) % PROGRESS_METRICS.length);
+      setProgressAnimating(false);
+    }, 200);
+  };
   const inputRef = useRef<HTMLInputElement>(null);
 
   const pillSuggestions = [
@@ -90,22 +109,27 @@ export default function App() {
             )}
           </button>
           {activeChatsOpen && ([
-            { id: 'insights' as AgentId, label: 'Insights & reporting', meta: '2h ago · 612 registrations', awaiting: true  },
-            { id: 'website'  as AgentId, label: 'Event website',         meta: '1d ago · Draft ready',       awaiting: true  },
-            { id: 'contacts' as AgentId, label: 'Contact & tickets',     meta: '3d ago · 340 warm contacts', awaiting: false },
-          ]).map(item => (
-            <a key={item.id} href="#" onClick={e => { e.preventDefault(); openAgent(item.id); }}
-              className={`flex items-center gap-2 px-3 py-2.5 rounded-md w-full text-sm ${sidebarAgentActive(item.id) ? 'bg-neutral-50 text-neutral-900 font-semibold' : 'text-neutral-700 hover:bg-neutral-50 transition-colors'}`}>
-              <div className="relative shrink-0">
-                <AgentAvatar agentId={item.id} size={20} />
-                {item.awaiting && <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />}
-              </div>
-              <div className={`flex flex-col min-w-0 transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>
-                <span className="whitespace-nowrap text-sm">{item.label}</span>
-                <span className="whitespace-nowrap text-[10px] text-neutral-400 font-normal mt-0.5">{item.meta}</span>
-              </div>
-            </a>
-          ))}
+            { id: 'insights' as AgentId, label: 'Insights & reporting', meta: '2h ago · 612 registrations', awaiting: true,  icon: PieChart },
+            { id: 'website'  as AgentId, label: 'Event website',        meta: '1d ago · Draft ready',       awaiting: true,  icon: Globe    },
+            { id: 'contacts' as AgentId, label: 'Contact & tickets',    meta: '3d ago · 340 warm contacts', awaiting: false, icon: Ticket   },
+          ]).map(item => {
+            const Icon = item.icon;
+            return (
+              <a key={item.id} href="#" onClick={e => { e.preventDefault(); openAgent(item.id); }}
+                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-md w-full text-sm ${sidebarAgentActive(item.id) ? 'bg-neutral-50 text-neutral-900 font-semibold' : 'text-neutral-700 hover:bg-neutral-50 transition-colors'}`}>
+                <div className="relative shrink-0">
+                  <div className={`rounded-[7px] flex items-center justify-center transition-all duration-200 ${collapsed ? 'w-5 h-5 rounded-[5px]' : 'w-7 h-7'}`} style={{ backgroundColor: AGENTS[item.id].cardBg }}>
+                    <Icon className={`text-neutral-900 transition-all duration-200 ${collapsed ? 'w-2.5 h-2.5' : 'w-3.5 h-3.5'}`} />
+                  </div>
+                  {item.awaiting && <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />}
+                </div>
+                <div className={`flex flex-col min-w-0 transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>
+                  <span className="whitespace-nowrap text-sm">{item.label}</span>
+                  <span className="whitespace-nowrap text-[10px] text-neutral-400 font-normal mt-0.5">{item.meta}</span>
+                </div>
+              </a>
+            );
+          })}
 
           {/* Recent chats section */}
           <button onClick={() => !collapsed && setRecentChatsOpen(v => !v)}
@@ -123,7 +147,6 @@ export default function App() {
             chatHistory.map(item => (
               <a key={item.id} href="#" onClick={e => { e.preventDefault(); openAgent(item.agentId); }}
                 className="flex items-center gap-2 px-3 py-2.5 rounded-md w-full text-sm text-neutral-500 hover:bg-neutral-50 transition-colors">
-                <AgentAvatar agentId={item.agentId} size={20} />
                 <div className={`flex flex-col min-w-0 transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>
                   <span className="whitespace-nowrap text-sm">{AGENTS[item.agentId].sub}</span>
                   <span className="whitespace-nowrap text-[10px] text-neutral-400 font-normal mt-0.5">{item.preview}</span>
@@ -156,17 +179,25 @@ export default function App() {
                     <p className="text-xs font-medium text-neutral-400">Activity</p>
                   </div>
                   <div className="flex flex-col gap-2 px-3 pb-3">
-                    {ACTIVITY_ITEMS.map(chat => (
-                      <div key={chat.id} onClick={() => { setShowActivity(false); openAgent(chat.id); }}
-                        className="flex items-center gap-3 px-4 py-3.5 bg-neutral-50 rounded-xl cursor-pointer hover:bg-neutral-100 transition-colors">
-                        <span className={`w-1.5 h-1.5 rounded-full shrink-0 self-start mt-[7px] ${chat.awaiting ? 'bg-blue-500 animate-pulse' : 'bg-neutral-300'}`} />
-                        <div className="flex flex-col flex-1 min-w-0">
-                          <span className="text-sm font-medium text-neutral-900 truncate">{chat.label}</span>
-                          <span className="text-xs text-neutral-400 mt-0.5">{chat.meta}</span>
+                    {ACTIVITY_ITEMS.map(chat => {
+                      const ActivityIcon = { insights: PieChart, website: Globe, contacts: Ticket }[chat.id];
+                      return (
+                        <div key={chat.id} onClick={() => { setShowActivity(false); openAgent(chat.id); }}
+                          className="flex items-center gap-3 px-4 py-3.5 bg-neutral-50 rounded-xl cursor-pointer hover:bg-neutral-100 transition-colors">
+                          <div className="relative shrink-0">
+                            <div className="w-8 h-8 rounded-[8px] flex items-center justify-center" style={{ backgroundColor: AGENTS[chat.id].cardBg }}>
+                              <ActivityIcon className="w-4 h-4 text-neutral-900" />
+                            </div>
+                            {chat.awaiting && <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />}
+                          </div>
+                          <div className="flex flex-col flex-1 min-w-0">
+                            <span className="text-sm font-medium text-neutral-900 truncate">{chat.label}</span>
+                            <span className="text-xs text-neutral-400 mt-0.5">{chat.meta}</span>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-neutral-300 shrink-0" />
                         </div>
-                        <ChevronRight className="w-4 h-4 text-neutral-300 shrink-0" />
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               </>
@@ -193,40 +224,62 @@ export default function App() {
 
             {/* Top block — greeting + agent cards */}
             <div className="flex-1 w-full max-w-[820px] flex flex-col items-center justify-center gap-16 z-10 relative px-4">
-              <div className="flex flex-col items-center gap-3 w-full">
+              <div className="flex flex-col items-center gap-10 w-full">
                 <div className="flex flex-col items-center gap-1">
                   <h1 className="text-[42px] text-neutral-900 tracking-tight" style={{ fontFamily: 'GalaxieCopernicus, serif' }}>Aloha, Jen</h1>
                   <p className="text-base text-neutral-400">Let's get some work done</p>
                 </div>
-                <div className="flex items-center justify-center gap-3 px-6 py-2">
-                  <p className="flex items-center gap-1.5 text-sm text-neutral-700">
-                    <TrendingUp className="w-4 h-4 text-emerald-500" />
-                    <span>Registration is at 61% of target</span>
-                  </p>
-                  <div className="w-px h-5 bg-neutral-200 mx-2" />
-                  <p className="flex items-center gap-1.5 text-sm text-neutral-700">
-                    <AlertCircle className="w-4 h-4 text-red-500" />
-                    <span>The early-bird deadline is in 3 days</span>
-                  </p>
+                <div className="flex items-center gap-4 w-full max-w-[600px] border border-neutral-200 rounded-2xl px-8 py-5">
+                  <span className="text-sm text-neutral-400 whitespace-nowrap shrink-0 transition-opacity duration-200" style={{ opacity: progressAnimating ? 0 : 1 }}>
+                    {PROGRESS_METRICS[progressIdx].left}
+                  </span>
+                  <div className="flex-1 h-1 bg-neutral-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-neutral-900 rounded-full transition-all duration-500 ease-out" style={{ width: progressAnimating ? '0%' : `${PROGRESS_METRICS[progressIdx].pct}%` }} />
+                  </div>
+                  <span className="text-sm whitespace-nowrap shrink-0 transition-opacity duration-200" style={{ opacity: progressAnimating ? 0 : 1 }}>
+                    <strong className="font-semibold text-neutral-700">{PROGRESS_METRICS[progressIdx].right}</strong>
+                    <span className="text-neutral-400"> · {PROGRESS_METRICS[progressIdx].sub}</span>
+                  </span>
+                  <button onClick={shuffleProgress} className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-neutral-300 hover:text-neutral-500 hover:bg-neutral-50 transition-colors">
+                    <Shuffle className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
 
               {/* Agent Cards */}
               <div className="flex gap-3 justify-center w-full">
                 {([
-                  { id: 'website'  as AgentId, title: 'Add speaker bio',     desc: "Dr. Sarah Chen's profile is missing from the speakers page. The bio is drafted and reviewed — ready to publish with one tap.", badge: 'Event website',        badgeIcon: <Globe className="w-3.5 h-3.5 text-neutral-400 shrink-0" /> },
-                  { id: 'contacts' as AgentId, title: 'Win warm contacts',    desc: "340 contacts opened your invite but haven't registered. Early-bird closes in 3 days — last-chance email is drafted and ready.", badge: 'Contact & tickets',    badgeIcon: <Ticket className="w-3.5 h-3.5 text-neutral-400 shrink-0" /> },
-                  { id: 'insights' as AgentId, title: 'See event insights', desc: "612 registrations — 61% of target, velocity climbing week over week. Revenue projections and full report are ready to review.", badge: 'Insights & reporting', badgeIcon: <PieChart className="w-3.5 h-3.5 text-neutral-400 shrink-0" /> },
+                  { id: 'website'  as AgentId, title: 'Add speaker bio',    stat: '1',   statLabel: 'bio ready',      desc: "Dr. Sarah Chen's profile is missing from the speakers page. Bio is drafted and reviewed — ready to publish.", badge: 'Event website'        },
+                  { id: 'contacts' as AgentId, title: 'Win warm contacts',  stat: '340', statLabel: 'warm contacts',  desc: "Contacts opened your invite but haven't registered. Early-bird closes in 3 days — email is ready to send.",  badge: 'Contact & tickets'    },
+                  { id: 'insights' as AgentId, title: 'See event insights', stat: '61%', statLabel: 'of seat target', desc: "At 612 registrations with velocity climbing week over week. Projecting 720–780 total before early-bird ends.",  badge: 'Insights & reporting' },
                 ]).map(card => (
                   <div key={card.id} onClick={() => openAgent(card.id)}
-                    className="bg-white p-6 rounded-[0.85175rem] flex flex-col gap-2 w-[290px] aspect-[3/2] overflow-hidden shadow-[0_1.136px_9.085px_0_rgba(0,0,0,0.05)] hover:shadow-[0px_4px_16px_0px_rgba(0,0,0,0.10)] border-[1.136px] border-[#ECEAEA] shrink-0 cursor-pointer transition-shadow duration-150">
-                    <div className="flex items-center gap-3">
-                      <AgentAvatar agentId={card.id} size={24} />
-                      <h3 className="font-semibold text-neutral-900 text-[15px] leading-tight">{card.title}</h3>
+                    className="p-5 rounded-[0.85175rem] flex flex-col w-[290px] shrink-0 cursor-pointer hover:brightness-110 transition-[filter] duration-150"
+                    style={{ backgroundColor: AGENTS[card.id].cardBg }}>
+                    {/* Category label + bookmark */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-semibold tracking-widest uppercase leading-none" style={{ color: 'rgba(0,0,0,0.5)' }}>{card.badge}</span>
+                      <button
+                        onClick={e => { e.stopPropagation(); setBookmarked(prev => { const next = new Set(prev); next.has(card.id) ? next.delete(card.id) : next.add(card.id); return next; }); }}
+                        className="p-0.5 -mr-0.5 -mt-0.5 rounded transition-opacity duration-150 hover:opacity-70">
+                        <Bookmark className={`w-3.5 h-3.5 transition-all duration-150 ${bookmarked.has(card.id) ? 'fill-current' : ''}`} style={{ color: 'rgba(0,0,0,0.4)' }} />
+                      </button>
                     </div>
-                    <p className="text-[13px] text-neutral-700 leading-[1.6] flex-1 line-clamp-3">{card.desc}</p>
-                    <div className="flex items-center pt-3 border-t border-neutral-100">
-                      <span className="text-[11px] text-neutral-400 font-medium">{card.badge}</span>
+                    {/* Title */}
+                    <h3 className="mt-2 text-[19px] font-bold leading-tight" style={{ color: '#171717' }}>{card.title}</h3>
+                    {/* Body */}
+                    <p className="mt-2 text-[13px] leading-relaxed line-clamp-3" style={{ color: '#171717' }}>{card.desc}</p>
+                    {/* Divider */}
+                    <div className="border-t mt-3" style={{ borderColor: 'rgba(0,0,0,0.15)' }} />
+                    {/* Stat + CTA */}
+                    <div className="flex items-end justify-between mt-3">
+                      <div>
+                        <p className="text-[10px] leading-none mb-1" style={{ color: 'rgba(0,0,0,0.5)' }}>{card.statLabel}</p>
+                        <p className="text-[32px] font-bold leading-none tracking-tight" style={{ color: '#171717' }}>{card.stat}</p>
+                      </div>
+                      <div className="w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0" style={{ backgroundColor: 'rgba(0,0,0,0.75)' }}>
+                        <ChevronRight className="w-4 h-4 text-white" />
+                      </div>
                     </div>
                   </div>
                 ))}
