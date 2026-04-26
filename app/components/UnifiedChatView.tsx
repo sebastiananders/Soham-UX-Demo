@@ -4,22 +4,13 @@ import { Button, Tag } from 'antd';
 import type { AgentId, ChatMessage } from '../../types';
 import { AGENTS, INITIAL_MESSAGES } from '../../constants';
 import { now } from '../../utils';
+import imgLogo from '../../imports/DeviceMacBookPro14/c4121c79ef3207dcf24c7435552bb7378ad17369.png';
 import { BTrace } from './BTrace';
+import { AgentAvatar } from './AgentAvatar';
 import { WebsiteCanvas } from './WebsiteCanvas';
 import { ContactsCanvas } from './ContactsCanvas';
 import { InsightsCanvas } from './InsightsCanvas';
 
-const agentAvatarColor: Record<AgentId, string> = {
-  website:  '#FFF000',
-  contacts: '#3B82F6',
-  insights: '#10B981',
-};
-
-const agentTagColor: Record<AgentId, string> = {
-  website:  '#7a7000',
-  contacts: '#1d4ed8',
-  insights: '#047857',
-};
 
 export function UnifiedChatView({ initialAgent, onBack }: { initialAgent: AgentId; onBack: () => void }) {
   const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_MESSAGES[initialAgent]);
@@ -64,12 +55,12 @@ export function UnifiedChatView({ initialAgent, onBack }: { initialAgent: AgentI
   const triggerHandoff = (from: AgentId, to: AgentId) => {
     const t = now();
     const handoffMsgs: ChatMessage[] = [
-      { kind: 'agent', agentId: from, text: `Happy to hand this off — let me bring in ${to === 'contacts' ? 'Maya, our contacts specialist' : to === 'insights' ? 'Kai, our analytics agent' : 'the website agent'}.`, time: t },
+      { kind: 'agent', agentId: from, text: `Happy to hand this off — switching to ${AGENTS[to].sub}.`, time: t },
       { kind: 'handoff', from, to, time: t },
       { kind: 'agent', agentId: to, text: to === 'contacts'
-          ? "Hi Jen! I'm Maya. I can see your warm contacts campaign — 340 people opened the invite but haven't registered. Want me to draft a follow-up email?"
+          ? "Hi Jen! I can see your warm contacts campaign — 340 people opened the invite but haven't registered. Want me to draft a follow-up email?"
           : to === 'insights'
-          ? "Hi Jen! I'm Kai. I can pull the latest registration data and projections for you. Give me a moment."
+          ? "Hi Jen! I can pull the latest registration data and projections for you. Give me a moment."
           : "Hi Jen! I can help with the event website. What would you like to work on?",
         time: t },
     ];
@@ -178,24 +169,10 @@ export function UnifiedChatView({ initialAgent, onBack }: { initialAgent: AgentI
       const agent = AGENTS[msg.agentId];
       return (
         <div key={i} className="flex gap-3">
-          <div className="w-7 h-7 rounded-full shrink-0 mt-0.5 overflow-hidden border border-neutral-100">
-            <img src={agent.photo} className="w-full h-full object-cover" />
-          </div>
+          <img src={imgLogo} className="w-7 h-7 object-contain shrink-0 mt-0.5" />
           <div className="flex flex-col gap-2">
             <div className="flex items-baseline gap-2">
-              <span className="text-sm font-semibold text-neutral-900">{agent.agentName}</span>
-              <Tag
-                style={{
-                  backgroundColor: agentAvatarColor[msg.agentId] + '22',
-                  color: agentTagColor[msg.agentId],
-                  borderColor: 'transparent',
-                  fontSize: 10,
-                  fontWeight: 500,
-                  lineHeight: '18px',
-                }}
-              >
-                {agent.sub}
-              </Tag>
+              <span className="text-sm font-semibold text-neutral-900">{agent.sub}</span>
               <span className="text-xs text-neutral-400">{msg.time}</span>
             </div>
             {msg.text && <p className="text-sm text-neutral-700 leading-relaxed">{msg.text}</p>}
@@ -222,16 +199,15 @@ export function UnifiedChatView({ initialAgent, onBack }: { initialAgent: AgentI
     }
 
     if (msg.kind === 'handoff') {
-      const fromAgent = AGENTS[msg.from];
       const toAgent = AGENTS[msg.to];
       return (
         <div key={i} className="flex items-center gap-3 py-2">
           <div className="flex-1 h-px bg-neutral-100" />
           <div className="flex items-center gap-2 shrink-0">
-            <img src={fromAgent.photo} className="w-5 h-5 rounded-full object-cover" />
+            <img src={imgLogo} className="w-5 h-5 object-contain shrink-0" />
             <span className="text-[11px] text-neutral-400">→</span>
-            <img src={toAgent.photo} className="w-5 h-5 rounded-full object-cover" />
-            <span className="text-[11px] text-neutral-500 font-medium">Switching to {toAgent.agentName}</span>
+            <img src={imgLogo} className="w-5 h-5 object-contain shrink-0" />
+            <span className="text-[11px] text-neutral-500 font-medium">Switching to {toAgent.sub}</span>
           </div>
           <div className="flex-1 h-px bg-neutral-100" />
         </div>
@@ -279,7 +255,7 @@ export function UnifiedChatView({ initialAgent, onBack }: { initialAgent: AgentI
       <div className="w-[400px] shrink-0 flex flex-col border-r border-neutral-100">
         <header className="flex items-center gap-3 px-6 py-5 border-b border-neutral-100 shrink-0 relative">
           <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-sm transition-colors duration-300"
-            style={{ backgroundColor: agentAvatarColor[activeAgent] === '#FFF000' ? '#FFF000' : agentAvatarColor[activeAgent] }} />
+            style={{ backgroundColor: AGENTS[activeAgent].accent }} />
           <Button
             type="text"
             onClick={onBack}
@@ -307,7 +283,7 @@ export function UnifiedChatView({ initialAgent, onBack }: { initialAgent: AgentI
               value={inputValue}
               onChange={e => setInputValue(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSend()}
-              placeholder={`Reply to ${AGENTS[activeAgent].agentName}…`}
+              placeholder={`Reply to ${AGENTS[activeAgent].sub}…`}
               className="flex-1 bg-transparent border-none outline-none text-[15px] text-neutral-900 placeholder:text-neutral-400"
             />
             <div className="flex items-center gap-2 shrink-0">

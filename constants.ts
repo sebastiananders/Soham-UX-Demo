@@ -1,10 +1,4 @@
 import type { AgentId, ChatMessage } from './types';
-import speakerIcon from './app/assets/speaker.svg';
-import warmContactsIcon from './app/assets/warmcontacts.svg';
-import regInsightIcon from './app/assets/reginsight.svg';
-import imgNova from './app/assets/nova.jpg';
-import imgLeo from './app/assets/leo.jpg';
-import imgAria from './app/assets/aria.jpg';
 
 // ── Agent config ───────────────────────────────────────────────────────────────
 
@@ -13,13 +7,10 @@ export const AGENTS: Record<AgentId, {
   sub: string;
   meta: string;
   accent: string;
-  icon: string;
-  agentName: string;
-  photo: string;
 }> = {
-  website:  { name: 'Speaker profiles',     sub: 'Event website',        meta: '1d ago · Draft ready',       accent: '#FFF000', icon: speakerIcon,      agentName: 'Nova', photo: imgNova },
-  contacts: { name: 'Win warm contacts',    sub: 'Contact & tickets',    meta: '3d ago · 340 warm contacts', accent: '#3B82F6', icon: warmContactsIcon, agentName: 'Leo',  photo: imgLeo  },
-  insights: { name: 'Registration insight', sub: 'Insights & reporting', meta: '2h ago · 612 registrations', accent: '#10B981', icon: regInsightIcon,   agentName: 'Aria', photo: imgAria },
+  website:  { name: 'Speaker profiles',     sub: 'Event website',        meta: '1d ago · Draft ready',       accent: '#F59E0B' },
+  contacts: { name: 'Win warm contacts',    sub: 'Contact & tickets',    meta: '3d ago · 340 warm contacts', accent: '#3B82F6' },
+  insights: { name: 'Registration insight', sub: 'Insights & reporting', meta: '2h ago · 612 registrations', accent: '#10B981' },
 };
 
 // ── Initial messages ───────────────────────────────────────────────────────────

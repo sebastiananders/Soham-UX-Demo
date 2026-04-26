@@ -3,13 +3,17 @@ import { Home, Globe, Ticket, PieChart, Bell, TrendingUp, AlertCircle, Plus, Mic
 import { Badge, Avatar } from 'antd';
 import imgLogo from "../imports/DeviceMacBookPro14/c4121c79ef3207dcf24c7435552bb7378ad17369.png";
 import imgProfile from "../imports/DeviceMacBookPro14/d48bb91af6b62d07c468e4d0ae99ca184be233a8.png";
-import imgNova from './assets/nova.jpg';
-import imgLeo from './assets/leo.jpg';
-import imgAria from './assets/aria.jpg';
 import { Illustration } from './components/FigmaIcons';
 import { UnifiedChatView } from './components/UnifiedChatView';
+import { AgentAvatar } from './components/AgentAvatar';
 import type { AgentId, HistoryItem } from '../types';
 import { AGENTS, INITIAL_MESSAGES } from '../constants';
+
+const ACTIVITY_ITEMS: { id: AgentId; label: string; meta: string; awaiting: boolean }[] = [
+  { id: 'insights', label: 'Want me to share this report with the team, or draft a summary for the exec update?', meta: 'Insights & reporting · awaiting response · 2h ago', awaiting: true },
+  { id: 'website',  label: 'Should I add the speaker section to the live page, or keep it as a draft?',           meta: 'Event website · awaiting response · 1d ago',        awaiting: true },
+  { id: 'contacts', label: 'Win warm contacts',                                                                    meta: 'Contact & tickets · last active 3d ago',             awaiting: false },
+];
 
 export default function App() {
   const [collapsed, setCollapsed] = useState(true);
@@ -19,6 +23,8 @@ export default function App() {
   const [activeSession, setActiveSession] = useState<AgentId | null>(null);
   const [chatHistory, setChatHistory] = useState<HistoryItem[]>([]);
   const [showActivity, setShowActivity] = useState(false);
+  const [activeChatsOpen, setActiveChatsOpen] = useState(true);
+  const [recentChatsOpen, setRecentChatsOpen] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const pillSuggestions = [
@@ -75,18 +81,23 @@ export default function App() {
         </div>
 
         <nav className="flex flex-col w-full px-2 gap-2">
-          <div className="px-3 py-1.5">
-            <span className={`text-xs font-medium text-neutral-400 whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>Recent chats</span>
-          </div>
-          {([
-            { id: 'insights' as AgentId, photo: imgAria, label: 'Insights & reporting', meta: '2h ago · 612 registrations', awaiting: true  },
-            { id: 'website'  as AgentId, photo: imgNova, label: 'Event website',         meta: '1d ago · Draft ready',       awaiting: true  },
-            { id: 'contacts' as AgentId, photo: imgLeo,  label: 'Contact & tickets',     meta: '3d ago · 340 warm contacts', awaiting: false },
+          {/* Active chats section */}
+          <button onClick={() => !collapsed && setActiveChatsOpen(v => !v)}
+            className={`flex items-center justify-between px-3 py-1.5 w-full rounded-md ${!collapsed ? 'hover:bg-neutral-50 transition-colors' : ''}`}>
+            <span className={`text-xs font-medium text-neutral-400 whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>Active chats</span>
+            {!collapsed && (
+              <ChevronRight className={`w-3 h-3 text-neutral-300 transition-transform duration-200 ${activeChatsOpen ? 'rotate-90' : ''}`} />
+            )}
+          </button>
+          {activeChatsOpen && ([
+            { id: 'insights' as AgentId, label: 'Insights & reporting', meta: '2h ago · 612 registrations', awaiting: true  },
+            { id: 'website'  as AgentId, label: 'Event website',         meta: '1d ago · Draft ready',       awaiting: true  },
+            { id: 'contacts' as AgentId, label: 'Contact & tickets',     meta: '3d ago · 340 warm contacts', awaiting: false },
           ]).map(item => (
             <a key={item.id} href="#" onClick={e => { e.preventDefault(); openAgent(item.id); }}
               className={`flex items-center gap-2 px-3 py-2.5 rounded-md w-full text-sm ${sidebarAgentActive(item.id) ? 'bg-neutral-50 text-neutral-900 font-semibold' : 'text-neutral-700 hover:bg-neutral-50 transition-colors'}`}>
               <div className="relative shrink-0">
-                <img src={item.photo} className="w-5 h-5 rounded-full object-cover" />
+                <AgentAvatar agentId={item.id} size={20} />
                 {item.awaiting && <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />}
               </div>
               <div className={`flex flex-col min-w-0 transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>
@@ -95,20 +106,80 @@ export default function App() {
               </div>
             </a>
           ))}
+
+          {/* Recent chats section */}
+          <button onClick={() => !collapsed && setRecentChatsOpen(v => !v)}
+            className={`flex items-center justify-between px-3 pt-3 pb-1.5 w-full rounded-md ${!collapsed ? 'hover:bg-neutral-50 transition-colors' : ''}`}>
+            <span className={`text-xs font-medium text-neutral-400 whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>Recent chats</span>
+            {!collapsed && (
+              <ChevronRight className={`w-3 h-3 text-neutral-300 transition-transform duration-200 ${recentChatsOpen ? 'rotate-90' : ''}`} />
+            )}
+          </button>
+          {recentChatsOpen && (chatHistory.length === 0 ? (
+            <div className={`px-3 py-1.5 transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>
+              <span className="text-xs text-neutral-300 whitespace-nowrap">No recent chats yet</span>
+            </div>
+          ) : (
+            chatHistory.map(item => (
+              <a key={item.id} href="#" onClick={e => { e.preventDefault(); openAgent(item.agentId); }}
+                className="flex items-center gap-2 px-3 py-2.5 rounded-md w-full text-sm text-neutral-500 hover:bg-neutral-50 transition-colors">
+                <AgentAvatar agentId={item.agentId} size={20} />
+                <div className={`flex flex-col min-w-0 transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>
+                  <span className="whitespace-nowrap text-sm">{AGENTS[item.agentId].sub}</span>
+                  <span className="whitespace-nowrap text-[10px] text-neutral-400 font-normal mt-0.5">{item.preview}</span>
+                </div>
+              </a>
+            ))
+          ))}
         </nav>
 
-        <div className="mt-auto flex flex-col items-center gap-3">
-          <Avatar src={imgProfile} size={40} style={{ flexShrink: 0, cursor: 'pointer' }} />
-          {!collapsed && (
-            <button style={{ color: '#404040', padding: 4 }}>
-              <MoreHorizontal className="w-5 h-5" />
+        <div className="mt-auto flex flex-col items-center gap-3 w-full px-2 relative">
+          {/* Activity bell */}
+          <div className="relative w-full">
+            <button
+              onClick={() => setShowActivity(v => !v)}
+              className={`flex items-center gap-2 px-3 py-2.5 rounded-md w-full text-sm text-neutral-700 hover:bg-neutral-50 transition-colors ${showActivity ? 'bg-neutral-50' : ''}`}
+            >
+              <div className="relative shrink-0">
+                <Badge count={ACTIVITY_ITEMS.filter(i => i.awaiting).length} style={{ backgroundColor: '#dbeafe', color: '#2563eb', boxShadow: '0 0 0 2px white', fontSize: 9, fontWeight: 600 }}>
+                  <Bell className="w-4 h-4 text-neutral-500" />
+                </Badge>
+              </div>
+              <span className={`whitespace-nowrap text-sm transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>Activity</span>
             </button>
-          )}
+
+            {showActivity && (
+              <>
+                <div className="fixed inset-0" onClick={() => setShowActivity(false)} />
+                <div className="absolute bottom-full left-full mb-2 ml-2 w-[380px] bg-white rounded-2xl shadow-[0_8px_32px_0_rgba(0,0,0,0.12)] border border-neutral-100 z-50 overflow-hidden">
+                  <div className="px-5 pt-5 pb-3">
+                    <p className="text-xs font-medium text-neutral-400">Activity</p>
+                  </div>
+                  <div className="flex flex-col gap-2 px-3 pb-3">
+                    {ACTIVITY_ITEMS.map(chat => (
+                      <div key={chat.id} onClick={() => { setShowActivity(false); openAgent(chat.id); }}
+                        className="flex items-center gap-3 px-4 py-3.5 bg-neutral-50 rounded-xl cursor-pointer hover:bg-neutral-100 transition-colors">
+                        <span className={`w-1.5 h-1.5 rounded-full shrink-0 self-start mt-[7px] ${chat.awaiting ? 'bg-blue-500 animate-pulse' : 'bg-neutral-300'}`} />
+                        <div className="flex flex-col flex-1 min-w-0">
+                          <span className="text-sm font-medium text-neutral-900 truncate">{chat.label}</span>
+                          <span className="text-xs text-neutral-400 mt-0.5">{chat.meta}</span>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-neutral-300 shrink-0" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
+          <Avatar src={imgProfile} size={40} style={{ flexShrink: 0, cursor: 'pointer' }} />
         </div>
       </aside>
 
       {/* Main Content */}
       <main className="flex-1 relative flex flex-col items-center overflow-hidden">
+
         {activeSession ? (
           <UnifiedChatView key={activeSession} initialAgent={activeSession} onBack={handleBack} />
         ) : (
@@ -120,46 +191,8 @@ export default function App() {
               </div>
             </div>
 
-            {/* Activity dropdown */}
-            <div className="absolute top-6 right-6 z-30">
-              <header className="flex items-center gap-3 cursor-pointer" onClick={() => setShowActivity(v => !v)}>
-                <Badge count={8} style={{ backgroundColor: '#dbeafe', color: '#2563eb', boxShadow: '0 0 0 2px white', fontSize: 10, fontWeight: 600 }}>
-                  <Bell className="w-5 h-5 text-neutral-700" />
-                </Badge>
-                <span className="font-medium text-sm text-neutral-700">Activity</span>
-              </header>
-
-              {showActivity && (
-                <>
-                  <div className="fixed inset-0" onClick={() => setShowActivity(false)} />
-                  <div className="absolute top-10 right-0 w-[380px] bg-white rounded-2xl shadow-[0_8px_32px_0_rgba(0,0,0,0.12)] border border-neutral-100 z-40 overflow-hidden">
-                    <div className="px-5 pt-5 pb-3">
-                      <p className="text-xs font-medium text-neutral-400">Activity</p>
-                    </div>
-                    <div className="flex flex-col gap-2 px-3 pb-3">
-                      {([
-                        { id: 'insights' as AgentId, label: 'Want me to share this report with the team, or draft a summary for the exec update?', meta: 'Aria is awaiting your response · 2h ago', awaiting: true },
-                        { id: 'website'  as AgentId, label: 'Should I add the speaker section to the live page, or keep it as a draft?',           meta: 'Nova is awaiting your response · 1d ago', awaiting: true },
-                        { id: 'contacts' as AgentId, label: 'Win warm contacts',                                                                    meta: 'Leo · Last active 3d ago',               awaiting: false },
-                      ]).map(chat => (
-                        <div key={chat.id} onClick={() => { setShowActivity(false); openAgent(chat.id); }}
-                          className="flex items-center gap-3 px-4 py-3.5 bg-neutral-50 rounded-xl cursor-pointer hover:bg-neutral-100 transition-colors">
-                          <span className={`w-1.5 h-1.5 rounded-full shrink-0 self-start mt-[7px] ${chat.awaiting ? 'bg-blue-500 animate-pulse' : 'bg-neutral-300'}`} />
-                          <div className="flex flex-col flex-1 min-w-0">
-                            <span className="text-sm font-medium text-neutral-900 truncate">{chat.label}</span>
-                            <span className="text-xs text-neutral-400 mt-0.5">{chat.meta}</span>
-                          </div>
-                          <ChevronRight className="w-4 h-4 text-neutral-300 shrink-0" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-
             {/* Top block — greeting + agent cards */}
-            <div className="flex-1 w-full max-w-[820px] flex flex-col items-center justify-center gap-8 z-10 relative px-4">
+            <div className="flex-1 w-full max-w-[820px] flex flex-col items-center justify-center gap-16 z-10 relative px-4">
               <div className="flex flex-col items-center gap-3 w-full">
                 <div className="flex flex-col items-center gap-1">
                   <h1 className="text-[42px] text-neutral-900 tracking-tight" style={{ fontFamily: 'GalaxieCopernicus, serif' }}>Aloha, Jen</h1>
@@ -181,19 +214,18 @@ export default function App() {
               {/* Agent Cards */}
               <div className="flex gap-3 justify-center w-full">
                 {([
-                  { id: 'website'  as AgentId, photo: imgNova, title: 'Speaker profiles',     desc: "Your event page is missing a speaker. Nova has drafted bio content and a layout section ready for review.", badge: 'Event website',        badgeIcon: <Globe className="w-3.5 h-3.5 text-neutral-400 shrink-0" /> },
-                  { id: 'contacts' as AgentId, photo: imgLeo,  title: 'Win warm contacts',    desc: "Draft a last-chance early-bird email to 340 warm contacts who opened the invite but haven't registered.",   badge: 'Contact & tickets',    badgeIcon: <Ticket className="w-3.5 h-3.5 text-neutral-400 shrink-0" /> },
-                  { id: 'insights' as AgentId, photo: imgAria, title: 'Registration insight', desc: "Gathered recent data about the 612 participants and a first insights into the revenue projection.",          badge: 'Insights & reporting', badgeIcon: <PieChart className="w-3.5 h-3.5 text-neutral-400 shrink-0" /> },
+                  { id: 'website'  as AgentId, title: 'Add speaker bio',     desc: "Dr. Sarah Chen's profile is missing from the speakers page. The bio is drafted and reviewed — ready to publish with one tap.", badge: 'Event website',        badgeIcon: <Globe className="w-3.5 h-3.5 text-neutral-400 shrink-0" /> },
+                  { id: 'contacts' as AgentId, title: 'Win warm contacts',    desc: "340 contacts opened your invite but haven't registered. Early-bird closes in 3 days — last-chance email is drafted and ready.", badge: 'Contact & tickets',    badgeIcon: <Ticket className="w-3.5 h-3.5 text-neutral-400 shrink-0" /> },
+                  { id: 'insights' as AgentId, title: 'See event insights', desc: "612 registrations — 61% of target, velocity climbing week over week. Revenue projections and full report are ready to review.", badge: 'Insights & reporting', badgeIcon: <PieChart className="w-3.5 h-3.5 text-neutral-400 shrink-0" /> },
                 ]).map(card => (
                   <div key={card.id} onClick={() => openAgent(card.id)}
-                    className="bg-white p-6 rounded-[0.85175rem] flex flex-col gap-2 w-[254px] shadow-[0_1.136px_9.085px_0_rgba(0,0,0,0.05)] hover:shadow-[0px_4px_16px_0px_rgba(0,0,0,0.10)] border-[1.136px] border-[#ECEAEA] shrink-0 cursor-pointer transition-shadow duration-150">
+                    className="bg-white p-6 rounded-[0.85175rem] flex flex-col gap-2 w-[290px] aspect-[3/2] overflow-hidden shadow-[0_1.136px_9.085px_0_rgba(0,0,0,0.05)] hover:shadow-[0px_4px_16px_0px_rgba(0,0,0,0.10)] border-[1.136px] border-[#ECEAEA] shrink-0 cursor-pointer transition-shadow duration-150">
                     <div className="flex items-center gap-3">
-                      <img src={card.photo} className="w-6 h-6 rounded-full object-cover shrink-0" />
+                      <AgentAvatar agentId={card.id} size={24} />
                       <h3 className="font-semibold text-neutral-900 text-[15px] leading-tight">{card.title}</h3>
                     </div>
-                    <p className="text-[12px] text-neutral-500 leading-[1.6] flex-1">{card.desc}</p>
-                    <div className="flex items-center gap-1.5 pt-1 border-t border-neutral-100">
-                      {card.badgeIcon}
+                    <p className="text-[13px] text-neutral-700 leading-[1.6] flex-1 line-clamp-3">{card.desc}</p>
+                    <div className="flex items-center pt-3 border-t border-neutral-100">
                       <span className="text-[11px] text-neutral-400 font-medium">{card.badge}</span>
                     </div>
                   </div>
