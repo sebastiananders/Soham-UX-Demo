@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Home, Globe, Ticket, PieChart, Bell, Plus, Mic, Paperclip, MoreHorizontal, ChevronRight, X, ArrowUp, Bookmark, Shuffle } from 'lucide-react';
 import { Badge, Avatar } from 'antd';
 import imgLogo from "../imports/DeviceMacBookPro14/c4121c79ef3207dcf24c7435552bb7378ad17369.png";
-import imgProfile from "../imports/DeviceMacBookPro14/d48bb91af6b62d07c468e4d0ae99ca184be233a8.png";
+import imgProfile from "./assets/aria.jpg";
 import { Illustration } from './components/FigmaIcons';
 import { UnifiedChatView } from './components/UnifiedChatView';
 import { AgentAvatar } from './components/AgentAvatar';
@@ -10,11 +10,11 @@ import type { AgentId, HistoryItem } from '../types';
 import { AGENTS, INITIAL_MESSAGES } from '../constants';
 
 const PROGRESS_METRICS = [
-  { left: '612 of 1,000 seats',          pct: 61, right: '61%',  sub: '3 days left on early-bird' },
-  { left: '€183,600 of €300K revenue',   pct: 61, right: '61%',  sub: 'on current pace'           },
-  { left: '8 of 12 speakers confirmed',  pct: 67, right: '67%',  sub: '4 still pending'           },
-  { left: '5 of 8 sponsors signed',      pct: 63, right: '63%',  sub: '2 weeks to deadline'       },
-  { left: '127 of 400 early-bird seats', pct: 32, right: '32%',  sub: 'still available'           },
+  { left: '612 of 1,000 seats',          pct: 61, right: '61%',  sub: '3 days left on early-bird', color: 'bg-neutral-900' },
+  { left: '€183,600 of €300K revenue',   pct: 61, right: '61%',  sub: 'on current pace',           color: 'bg-neutral-900' },
+  { left: '8 of 12 speakers confirmed',  pct: 67, right: '67%',  sub: '4 still pending',           color: 'bg-green-500'   },
+  { left: '5 of 8 sponsors signed',      pct: 63, right: '63%',  sub: '2 weeks to deadline',       color: 'bg-neutral-900' },
+  { left: '127 of 400 early-bird seats', pct: 32, right: '32%',  sub: 'still available',           color: 'bg-red-500'     },
 ];
 
 const ACTIVITY_ITEMS: { id: AgentId; label: string; meta: string; awaiting: boolean }[] = [
@@ -83,7 +83,7 @@ export default function App() {
     <div className="flex min-h-screen bg-white font-sans text-neutral-900 overflow-x-hidden">
       {/* Sidebar */}
       <aside
-        className={`${collapsed ? 'w-[64px]' : 'w-[200px]'} border-r border-neutral-200 flex flex-col items-center py-8 bg-white z-20 shrink-0 transition-all duration-200 overflow-visible relative`}
+        className={`${collapsed ? 'w-[64px]' : 'w-[240px]'} border-r border-neutral-200 flex flex-col items-center py-8 bg-white z-20 shrink-0 transition-all duration-200 overflow-visible relative`}
         onMouseEnter={() => setCollapsed(false)}
         onMouseLeave={() => setCollapsed(true)}
       >
@@ -95,7 +95,7 @@ export default function App() {
           <a href="#" onClick={e => { e.preventDefault(); setActiveSession(null); }}
             className={`flex items-center gap-2 px-3 py-3 rounded-md w-full text-sm ${activeSession === null ? 'bg-neutral-50 text-neutral-900 font-semibold' : 'text-neutral-700 hover:bg-neutral-50 transition-colors'}`}>
             <Home className="w-4 h-4 text-neutral-400 shrink-0" />
-            <span className={`whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>Soham home</span>
+            <span className={`whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`} style={{ transitionDelay: collapsed ? '0ms' : '200ms' }}>Soham home</span>
           </a>
         </div>
 
@@ -103,7 +103,7 @@ export default function App() {
           {/* Active chats section */}
           <button onClick={() => !collapsed && setActiveChatsOpen(v => !v)}
             className={`flex items-center justify-between px-3 py-1.5 w-full rounded-md ${!collapsed ? 'hover:bg-neutral-50 transition-colors' : ''}`}>
-            <span className={`text-xs font-medium text-neutral-400 whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>Active chats</span>
+            <span className={`text-xs font-medium text-neutral-400 whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`} style={{ transitionDelay: collapsed ? '0ms' : '200ms' }}>Active chats</span>
             {!collapsed && (
               <ChevronRight className={`w-3 h-3 text-neutral-300 transition-transform duration-200 ${activeChatsOpen ? 'rotate-90' : ''}`} />
             )}
@@ -119,11 +119,11 @@ export default function App() {
                 className={`flex items-center gap-2.5 px-3 py-2.5 rounded-md w-full text-sm ${sidebarAgentActive(item.id) ? 'bg-neutral-50 text-neutral-900 font-semibold' : 'text-neutral-700 hover:bg-neutral-50 transition-colors'}`}>
                 <div className="relative shrink-0">
                   <div className={`rounded-[7px] flex items-center justify-center transition-all duration-200 ${collapsed ? 'w-5 h-5 rounded-[5px]' : 'w-7 h-7'}`} style={{ backgroundColor: AGENTS[item.id].cardBg }}>
-                    <Icon className={`text-neutral-900 transition-all duration-200 ${collapsed ? 'w-2.5 h-2.5' : 'w-3.5 h-3.5'}`} />
+                    <Icon className={`transition-all duration-200 ${collapsed ? 'w-2.5 h-2.5' : 'w-3.5 h-3.5'}`} style={{ color: AGENTS[item.id].accent }} />
                   </div>
                   {item.awaiting && <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />}
                 </div>
-                <div className={`flex flex-col min-w-0 transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>
+                <div className={`flex flex-col min-w-0 transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`} style={{ transitionDelay: collapsed ? '0ms' : '200ms' }}>
                   <span className="whitespace-nowrap text-sm">{item.label}</span>
                   <span className="whitespace-nowrap text-[10px] text-neutral-400 font-normal mt-0.5">{item.meta}</span>
                 </div>
@@ -134,22 +134,22 @@ export default function App() {
           {/* Recent chats section */}
           <button onClick={() => !collapsed && setRecentChatsOpen(v => !v)}
             className={`flex items-center justify-between px-3 pt-3 pb-1.5 w-full rounded-md ${!collapsed ? 'hover:bg-neutral-50 transition-colors' : ''}`}>
-            <span className={`text-xs font-medium text-neutral-400 whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>Recent chats</span>
+            <span className={`text-xs font-medium text-neutral-400 whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`} style={{ transitionDelay: collapsed ? '0ms' : '200ms' }}>Recent chats</span>
             {!collapsed && (
               <ChevronRight className={`w-3 h-3 text-neutral-300 transition-transform duration-200 ${recentChatsOpen ? 'rotate-90' : ''}`} />
             )}
           </button>
           {recentChatsOpen && (chatHistory.length === 0 ? (
-            <div className={`px-3 py-1.5 transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>
+            <div className={`px-3 py-1.5 transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`} style={{ transitionDelay: collapsed ? '0ms' : '200ms' }}>
               <span className="text-xs text-neutral-300 whitespace-nowrap">No recent chats yet</span>
             </div>
           ) : (
             chatHistory.map(item => (
               <a key={item.id} href="#" onClick={e => { e.preventDefault(); openAgent(item.agentId); }}
                 className="flex items-center gap-2 px-3 py-2.5 rounded-md w-full text-sm text-neutral-500 hover:bg-neutral-50 transition-colors">
-                <div className={`flex flex-col min-w-0 transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>
+                <div className={`flex flex-col min-w-0 transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`} style={{ transitionDelay: collapsed ? '0ms' : '200ms' }}>
                   <span className="whitespace-nowrap text-sm">{AGENTS[item.agentId].sub}</span>
-                  <span className="whitespace-nowrap text-[10px] text-neutral-400 font-normal mt-0.5">{item.preview}</span>
+                  <span className="text-[10px] text-neutral-400 font-normal mt-0.5 break-words">{item.preview}</span>
                 </div>
               </a>
             ))
@@ -161,14 +161,14 @@ export default function App() {
           <div className="relative w-full">
             <button
               onClick={() => setShowActivity(v => !v)}
-              className={`flex items-center gap-2 px-3 py-2.5 rounded-md w-full text-sm text-neutral-700 hover:bg-neutral-50 transition-colors ${showActivity ? 'bg-neutral-50' : ''}`}
+              className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-md w-full text-sm text-neutral-700 hover:bg-neutral-50 transition-colors ${showActivity ? 'bg-neutral-50' : ''}`}
             >
               <div className="relative shrink-0">
                 <Badge count={ACTIVITY_ITEMS.filter(i => i.awaiting).length} style={{ backgroundColor: '#dbeafe', color: '#2563eb', boxShadow: '0 0 0 2px white', fontSize: 9, fontWeight: 600 }}>
                   <Bell className="w-4 h-4 text-neutral-500" />
                 </Badge>
               </div>
-              <span className={`whitespace-nowrap text-sm transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>Activity</span>
+              <span className={`text-sm transition-all duration-150 overflow-hidden ${collapsed ? 'opacity-0 max-w-0' : 'opacity-100 max-w-[120px] whitespace-nowrap'}`} style={{ transitionDelay: collapsed ? '0ms' : '200ms', display: 'inline-block' }}>Activity</span>
             </button>
 
             {showActivity && (
@@ -204,6 +204,7 @@ export default function App() {
             )}
           </div>
 
+          <div className="w-full border-t border-neutral-100 mx-2" />
           <Avatar src={imgProfile} size={40} style={{ flexShrink: 0, cursor: 'pointer' }} />
         </div>
       </aside>
@@ -223,13 +224,13 @@ export default function App() {
             </div>
 
             {/* Top block — greeting + agent cards */}
-            <div className="flex-1 w-full max-w-[820px] flex flex-col items-center justify-center gap-16 z-10 relative px-4">
+            <div className="flex-1 w-full max-w-[820px] flex flex-col items-center justify-center z-10 relative px-4">
               <div className="flex flex-col items-center gap-10 w-full">
                 <div className="flex flex-col items-center gap-1">
-                  <h1 className="text-[42px] font-bold text-neutral-900 tracking-tight" style={{ fontFamily: 'GalaxieCopernicus, serif' }}>Aloha, Jen</h1>
-                  <p className="text-base text-neutral-400">Today is a good day &#9728;&#65039;</p>
+                  <h1 className="text-[42px] font-normal text-neutral-900 tracking-tight" style={{ fontFamily: 'GalaxieCopernicus, serif' }}>Aloha, Jen</h1>
+                  <p className="text-base text-neutral-400">What shall we do today?</p>
                 </div>
-                <div className="flex items-center gap-4 w-full max-w-[600px] border border-neutral-200 rounded-2xl px-8 py-5">
+                <div className="flex items-center gap-4 w-full border border-transparent rounded-2xl px-8 py-5">
                   <span className="text-sm text-neutral-400 whitespace-nowrap shrink-0 transition-opacity duration-200" style={{ opacity: progressAnimating ? 0 : 1 }}>
                     {PROGRESS_METRICS[progressIdx].left}
                   </span>
@@ -240,45 +241,48 @@ export default function App() {
                     <strong className="font-semibold text-neutral-700">{PROGRESS_METRICS[progressIdx].right}</strong>
                     <span className="text-neutral-400"> · {PROGRESS_METRICS[progressIdx].sub}</span>
                   </span>
-                  <button onClick={shuffleProgress} className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-neutral-300 hover:text-neutral-500 hover:bg-neutral-50 transition-colors">
+                  <button onClick={shuffleProgress} className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-blue-500 hover:text-blue-600 hover:bg-neutral-50 transition-colors">
                     <Shuffle className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
 
+              {/* <div className="w-full border-t border-neutral-200 mt-6" /> */}
+
               {/* Agent Cards */}
-              <div className="flex gap-3 justify-center w-full">
+              <div className="flex gap-3 justify-center w-full mt-12">
                 {([
-                  { id: 'website'  as AgentId, title: 'Add speaker bio',    stat: '1',   statLabel: 'bio ready',      desc: "Dr. Sarah Chen's profile is missing from the speakers page. Bio is drafted and reviewed — ready to publish.", badge: 'Event website'        },
-                  { id: 'contacts' as AgentId, title: 'Win warm contacts',  stat: '340', statLabel: 'warm contacts',  desc: "Contacts opened your invite but haven't registered. Early-bird closes in 3 days — email is ready to send.",  badge: 'Contact & tickets'    },
                   { id: 'insights' as AgentId, title: 'See event insights', stat: '61%', statLabel: 'of seat target', desc: "At 612 registrations with velocity climbing week over week. Projecting 720–780 total before early-bird ends.",  badge: 'Insights & reporting' },
+                  { id: 'contacts' as AgentId, title: 'Win warm contacts',  stat: '340', statLabel: 'warm contacts',  desc: "Contacts opened your invite but haven't registered. Early-bird closes in 3 days — email is ready to send.",  badge: 'Contact & tickets'    },
+                  { id: 'website'  as AgentId, title: 'Add speaker bio',    stat: '1',   statLabel: 'bio ready',      desc: "Dr. Sarah Chen's profile is missing from the speakers page. Bio is drafted and reviewed — ready to publish.", badge: 'Event website'        },
                 ]).map(card => (
                   <div key={card.id} onClick={() => openAgent(card.id)}
-                    className="p-5 rounded-[0.85175rem] flex flex-col w-[290px] shrink-0 cursor-pointer hover:brightness-110 transition-[filter] duration-150"
-                    style={{ backgroundColor: AGENTS[card.id].cardBg }}>
-                    {/* Category label + bookmark */}
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-semibold tracking-widest uppercase leading-none" style={{ color: 'rgba(0,0,0,0.5)' }}>{card.badge}</span>
-                      <button
-                        onClick={e => { e.stopPropagation(); setBookmarked(prev => { const next = new Set(prev); next.has(card.id) ? next.delete(card.id) : next.add(card.id); return next; }); }}
-                        className="p-0.5 -mr-0.5 -mt-0.5 rounded transition-opacity duration-150 hover:opacity-70">
-                        <Bookmark className={`w-3.5 h-3.5 transition-all duration-150 ${bookmarked.has(card.id) ? 'fill-current' : ''}`} style={{ color: 'rgba(0,0,0,0.4)' }} />
-                      </button>
-                    </div>
-                    {/* Title */}
-                    <h3 className="mt-2 text-[19px] font-bold leading-tight" style={{ color: '#171717' }}>{card.title}</h3>
-                    {/* Body */}
-                    <p className="mt-2 text-[13px] leading-relaxed line-clamp-3" style={{ color: '#171717' }}>{card.desc}</p>
-                    {/* Divider */}
-                    <div className="border-t mt-3" style={{ borderColor: 'rgba(0,0,0,0.15)' }} />
-                    {/* Stat + CTA */}
-                    <div className="flex items-end justify-between mt-3">
-                      <div>
-                        <p className="text-[10px] leading-none mb-1" style={{ color: 'rgba(0,0,0,0.5)' }}>{card.statLabel}</p>
-                        <p className="text-[32px] font-bold leading-none tracking-tight" style={{ color: '#171717' }}>{card.stat}</p>
+                    className="rounded-[0.85175rem] flex flex-col w-[290px] shrink-0 cursor-pointer overflow-hidden hover:shadow-lg transition-all duration-150"
+                    style={{
+                      backgroundColor: AGENTS[card.id].cardBg,
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                    }}>
+                    {/* Card body */}
+                    <div className="p-5 flex flex-col">
+                      {/* Title */}
+                      <h3 className="text-[19px] font-bold leading-tight" style={{ color: '#171717' }}>{card.title}</h3>
+                      {/* Category label */}
+                      <div className="flex items-center mt-2">
+                        <span className="text-[10px] font-semibold tracking-widest uppercase leading-none px-2 py-1" style={{ backgroundColor: `${AGENTS[card.id].accent}80`, color: '#171717', borderRadius: '2px' }}>{card.badge}</span>
                       </div>
-                      <div className="w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0" style={{ backgroundColor: 'rgba(0,0,0,0.75)' }}>
-                        <ChevronRight className="w-4 h-4 text-white" />
+                      {/* Body */}
+                      <p className="mt-4 text-[13px] leading-relaxed line-clamp-3" style={{ color: '#6B7280' }}>{card.desc}</p>
+                      {/* Divider */}
+                      <div className="border-t mt-3" style={{ borderColor: '#E5E7EB' }} />
+                      {/* Stat + CTA */}
+                      <div className="flex items-end justify-between mt-3">
+                        <div>
+                          <p className="text-[10px] leading-none mb-1" style={{ color: 'rgba(0,0,0,0.5)' }}>{card.statLabel}</p>
+                          <p className="text-[32px] font-bold leading-none tracking-tight" style={{ color: '#171717' }}>{card.stat}</p>
+                        </div>
+                        <div className="w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0" style={{ backgroundColor: AGENTS[card.id].accent }}>
+                          <ChevronRight className="w-4 h-4" style={{ color: card.id === 'website' ? '#171717' : '#ffffff' }} />
+                        </div>
                       </div>
                     </div>
                   </div>
