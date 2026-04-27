@@ -179,15 +179,14 @@ export function UnifiedChatView({ initialAgent, onBack }: { initialAgent: AgentI
             </div>
             {msg.text && <p className="text-sm text-neutral-700 leading-relaxed">{msg.text}</p>}
             {msg.actions && (
-              <div className="flex gap-2 flex-wrap">
+              <div className="flex gap-2 flex-wrap mt-6">
                 {msg.actions.map(a => (
                   <Button
                     key={a.id}
-                    shape="round"
                     onClick={() => handleAction(a.id)}
                     style={a.primary
-                      ? { backgroundColor: AGENTS[activeAgent].accent, borderColor: AGENTS[activeAgent].accent, color: '#171717', fontWeight: 600 }
-                      : { backgroundColor: '#f5f5f5', borderColor: 'transparent', color: '#404040', fontWeight: 600 }
+                      ? { backgroundColor: AGENTS[activeAgent].accent, borderColor: AGENTS[activeAgent].accent, color: '#171717', fontWeight: 600, borderRadius: '4px', display: 'flex', alignItems: 'center' }
+                      : { backgroundColor: '#f5f5f5', borderColor: 'transparent', color: '#404040', fontWeight: 600, borderRadius: '4px', display: 'flex', alignItems: 'center' }
                     }
                   >
                     {a.label}
@@ -264,7 +263,7 @@ export function UnifiedChatView({ initialAgent, onBack }: { initialAgent: AgentI
             style={{ width: 34, height: 34, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, color: 'rgba(0,0,0,0.5)', flexShrink: 0 }}
           />
           <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-semibold tracking-widest uppercase leading-none px-2 py-1 self-start" style={{ backgroundColor: `${AGENTS[activeAgent].accent}80`, color: '#171717', borderRadius: '2px' }}>{agentInfo.sub}</span>
+            <span className="text-[10px] font-semibold tracking-widest uppercase leading-none px-2 py-1 self-start" style={{ backgroundColor: `${AGENTS[activeAgent].accent}80`, color: '#171717', borderRadius: '4px' }}>{agentInfo.sub}</span>
             <h2 className="font-bold text-[18px] leading-tight" style={{ color: '#171717' }}>{agentInfo.name}</h2>
             <span className="text-[12px] font-medium" style={{ color: '#9CA3AF' }}>{agentInfo.meta}</span>
           </div>

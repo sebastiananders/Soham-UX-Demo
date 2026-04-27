@@ -10,10 +10,10 @@ import type { AgentId, HistoryItem } from '../types';
 import { AGENTS, INITIAL_MESSAGES } from '../constants';
 
 const PROGRESS_METRICS = [
-  { left: '612 of 1,000 seats',          pct: 61, right: '61%',  sub: '3 days left on early-bird', color: 'bg-neutral-900' },
-  { left: '€183,600 of €300K revenue',   pct: 61, right: '61%',  sub: 'on current pace',           color: 'bg-neutral-900' },
+  { left: '612 of 1,000 seats',          pct: 61, right: '61%',  sub: '3 days left on early-bird', color: 'bg-[rgba(0,0,0,0.9)]' },
+  { left: '€183,600 of €300K revenue',   pct: 61, right: '61%',  sub: 'on current pace',           color: 'bg-[rgba(0,0,0,0.9)]' },
   { left: '8 of 12 speakers confirmed',  pct: 67, right: '67%',  sub: '4 still pending',           color: 'bg-green-500'   },
-  { left: '5 of 8 sponsors signed',      pct: 63, right: '63%',  sub: '2 weeks to deadline',       color: 'bg-neutral-900' },
+  { left: '5 of 8 sponsors signed',      pct: 63, right: '63%',  sub: '2 weeks to deadline',       color: 'bg-[rgba(0,0,0,0.9)]' },
   { left: '127 of 400 early-bird seats', pct: 32, right: '32%',  sub: 'still available',           color: 'bg-red-500'     },
 ];
 
@@ -131,6 +131,14 @@ export default function App() {
             );
           })}
 
+          <button onClick={() => setActiveSession(null)}
+            className="flex items-center gap-2.5 px-3 py-2.5 rounded-md w-full text-sm text-neutral-400 hover:bg-neutral-50 hover:text-neutral-600 transition-colors">
+            <div className={`rounded-[7px] flex items-center justify-center bg-neutral-100 transition-all duration-200 shrink-0 ${collapsed ? 'w-5 h-5 rounded-[5px]' : 'w-7 h-7'}`}>
+              <Plus className={`transition-all duration-200 ${collapsed ? 'w-2.5 h-2.5' : 'w-3.5 h-3.5'}`} />
+            </div>
+            <span className={`whitespace-nowrap text-sm transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`} style={{ transitionDelay: collapsed ? '0ms' : '200ms' }}>Start a new chat</span>
+          </button>
+
           {/* Recent chats section */}
           <button onClick={() => !collapsed && setRecentChatsOpen(v => !v)}
             className={`flex items-center justify-between px-3 pt-3 pb-1.5 w-full rounded-md ${!collapsed ? 'hover:bg-neutral-50 transition-colors' : ''}`}>
@@ -228,18 +236,18 @@ export default function App() {
               <div className="flex flex-col items-center gap-10 w-full">
                 <div className="flex flex-col items-center gap-1">
                   <h1 className="text-[42px] font-normal text-neutral-900 tracking-tight" style={{ fontFamily: 'GalaxieCopernicus, serif' }}>Aloha, Jen</h1>
-                  <p className="text-base text-neutral-400">What shall we do today?</p>
+                  {/* <p className="text-base text-neutral-400">What shall we do today?</p> */}
                 </div>
-                <div className="flex items-center gap-4 w-full border border-transparent rounded-2xl px-8 py-5">
-                  <span className="text-sm text-neutral-400 whitespace-nowrap shrink-0 transition-opacity duration-200" style={{ opacity: progressAnimating ? 0 : 1 }}>
+                <div className="flex items-center gap-4 w-[70%] border border-transparent bg-neutral-50 rounded-2xl px-8 py-5">
+                  <span className="text-sm text-neutral-500 whitespace-nowrap shrink-0 transition-opacity duration-200" style={{ opacity: progressAnimating ? 0 : 1 }}>
                     {PROGRESS_METRICS[progressIdx].left}
                   </span>
-                  <div className="flex-1 h-1 bg-neutral-100 rounded-full overflow-hidden">
+                  <div className="flex-1 h-1 bg-neutral-200 rounded-full overflow-hidden">
                     <div className={`h-full ${PROGRESS_METRICS[progressIdx].color} rounded-full transition-all duration-500 ease-out`} style={{ width: progressAnimating ? '0%' : `${PROGRESS_METRICS[progressIdx].pct}%` }} />
                   </div>
                   <span className="text-sm whitespace-nowrap shrink-0 transition-opacity duration-200" style={{ opacity: progressAnimating ? 0 : 1 }}>
                     <strong className="font-semibold text-neutral-700">{PROGRESS_METRICS[progressIdx].right}</strong>
-                    <span className="text-neutral-400"> · {PROGRESS_METRICS[progressIdx].sub}</span>
+                    <span className="text-neutral-500"> · {PROGRESS_METRICS[progressIdx].sub}</span>
                   </span>
                   <button onClick={shuffleProgress} className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-blue-500 hover:text-blue-600 hover:bg-neutral-50 transition-colors">
                     <Shuffle className="w-3.5 h-3.5" />
@@ -252,9 +260,9 @@ export default function App() {
               {/* Agent Cards */}
               <div className="flex gap-3 justify-center w-full mt-12">
                 {([
-                  { id: 'insights' as AgentId, title: 'See event insights', stat: '61%', statLabel: 'of seat target', desc: "At 612 registrations with velocity climbing week over week. Projecting 720–780 total before early-bird ends.",  badge: 'Insights & reporting' },
-                  { id: 'contacts' as AgentId, title: 'Win warm contacts',  stat: '340', statLabel: 'warm contacts',  desc: "Contacts opened your invite but haven't registered. Early-bird closes in 3 days — email is ready to send.",  badge: 'Contact & tickets'    },
-                  { id: 'website'  as AgentId, title: 'Add speaker bio',    stat: '1',   statLabel: 'bio ready',      desc: "Dr. Sarah Chen's profile is missing from the speakers page. Bio is drafted and reviewed — ready to publish.", badge: 'Event website'        },
+                  { id: 'insights' as AgentId, title: 'See event insights', stat: '61%', statLabel: 'of seat target', desc: "At 612 registrations with velocity climbing week over week. Projecting 720–780 total before early-bird ends.",  badge: 'Insights & reporting', cta: 'Share insight'  },
+                  { id: 'contacts' as AgentId, title: 'Win warm contacts',  stat: '340', statLabel: 'warm contacts',  desc: "Contacts opened your invite but haven't registered. Early-bird closes in 3 days — email is ready to send.",  badge: 'Contact & tickets',    cta: 'Draft mail'     },
+                  { id: 'website'  as AgentId, title: 'Add speaker bio',    stat: '1',   statLabel: 'bio ready',      desc: "Dr. Sarah Chen's profile is missing from the speakers page. Bio is drafted and reviewed — ready to publish.", badge: 'Event website',        cta: 'Publish bio'    },
                 ]).map(card => (
                   <div key={card.id} onClick={() => openAgent(card.id)}
                     className="rounded-[0.85175rem] flex flex-col w-[290px] shrink-0 cursor-pointer overflow-hidden hover:shadow-lg transition-all duration-150"
@@ -275,14 +283,12 @@ export default function App() {
                       {/* Divider */}
                       <div className="border-t mt-3" style={{ borderColor: '#E5E7EB' }} />
                       {/* Stat + CTA */}
-                      <div className="flex items-end justify-between mt-3">
+                      <div className="flex items-center justify-between mt-3">
                         <div>
                           <p className="text-[10px] leading-none mb-1" style={{ color: 'rgba(0,0,0,0.5)' }}>{card.statLabel}</p>
                           <p className="text-[32px] font-bold leading-none tracking-tight" style={{ color: '#171717' }}>{card.stat}</p>
                         </div>
-                        <div className="w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0" style={{ backgroundColor: AGENTS[card.id].accent }}>
-                          <ChevronRight className="w-4 h-4" style={{ color: card.id === 'website' ? '#171717' : '#ffffff' }} />
-                        </div>
+                        <span className="text-[12px] font-normal px-4 py-2" style={{ color: '#171717', backgroundColor: 'rgba(0,0,0,0.03)', borderRadius: '4px' }}>{card.cta}</span>
                       </div>
                     </div>
                   </div>
