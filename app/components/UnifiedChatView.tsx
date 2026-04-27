@@ -206,9 +206,9 @@ export function UnifiedChatView({ initialAgent, onBack }: { initialAgent: AgentI
         <div key={i} className="flex items-center gap-3 py-2">
           <div className="flex-1 h-px bg-neutral-100" />
           <div className="flex items-center gap-2 shrink-0">
-            <img src={imgLogo} className="w-5 h-5 object-contain shrink-0" />
+            <img src={bizzaLogo} className="w-5 h-5 object-contain shrink-0" />
             <span className="text-[11px] text-neutral-400">→</span>
-            <img src={imgLogo} className="w-5 h-5 object-contain shrink-0" />
+            <img src={bizzaLogo} className="w-5 h-5 object-contain shrink-0" />
             <span className="text-[11px] text-neutral-500 font-medium">Switching to {toAgent.sub}</span>
           </div>
           <div className="flex-1 h-px bg-neutral-100" />

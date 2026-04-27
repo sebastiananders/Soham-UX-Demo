@@ -235,7 +235,7 @@ export default function App() {
                     {PROGRESS_METRICS[progressIdx].left}
                   </span>
                   <div className="flex-1 h-1 bg-neutral-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-neutral-900 rounded-full transition-all duration-500 ease-out" style={{ width: progressAnimating ? '0%' : `${PROGRESS_METRICS[progressIdx].pct}%` }} />
+                    <div className={`h-full ${PROGRESS_METRICS[progressIdx].color} rounded-full transition-all duration-500 ease-out`} style={{ width: progressAnimating ? '0%' : `${PROGRESS_METRICS[progressIdx].pct}%` }} />
                   </div>
                   <span className="text-sm whitespace-nowrap shrink-0 transition-opacity duration-200" style={{ opacity: progressAnimating ? 0 : 1 }}>
                     <strong className="font-semibold text-neutral-700">{PROGRESS_METRICS[progressIdx].right}</strong>
