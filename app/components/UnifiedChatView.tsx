@@ -1,6 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, Plus, Mic, Paperclip, Check } from 'lucide-react';
 import { Button, Tag } from 'antd';
+
+const hexToRgba = (hex: string, alpha: number) => {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+};
 import type { AgentId, ChatMessage } from '../../types';
 import { AGENTS, INITIAL_MESSAGES } from '../../constants';
 import { now } from '../../utils';
@@ -102,6 +109,16 @@ export function UnifiedChatView({ initialAgent, onBack }: { initialAgent: AgentI
         { kind: 'user', text: 'Edit draft', time: t },
         { kind: 'agent', agentId: 'contacts', text: "Of course — what would you like to change? The subject line, tone, or the CTA?", time: t },
       ]);
+    } else if (id === 'send-draft') {
+      addMessages([
+        { kind: 'user', text: 'Send to team', time: t },
+        { kind: 'agent', agentId: 'insights', text: "Sent! Your team will receive the exec summary by email. Let me know if you need any follow-up.", time: t },
+      ]);
+    } else if (id === 'edit-exec-draft') {
+      addMessages([
+        { kind: 'user', text: 'Edit draft', time: t },
+        { kind: 'agent', agentId: 'insights', text: "Sure — what would you like to change? The tone, length, or specific data points?", time: t },
+      ]);
     } else if (id === 'share') {
       addMessages([
         { kind: 'user', text: 'Share with team', time: t },
@@ -120,7 +137,7 @@ export function UnifiedChatView({ initialAgent, onBack }: { initialAgent: AgentI
           return [
             ...next,
             { kind: 'task-done', label: 'Exec summary ready', summary: 'Two tone variants drafted — formal & narrative' },
-            { kind: 'agent', agentId: 'insights' as AgentId, text: 'Two drafts are ready — pick your tone in the Exec Summary tab on the right →', time: now() },
+            { kind: 'agent', agentId: 'insights' as AgentId, text: 'Two drafts are ready on the right — select one to continue.', time: now() },
           ];
         });
         setDraftState('done');
@@ -179,18 +196,22 @@ export function UnifiedChatView({ initialAgent, onBack }: { initialAgent: AgentI
             </div>
             {msg.text && <p className="text-sm text-neutral-700 leading-relaxed">{msg.text}</p>}
             {msg.actions && (
-              <div className="flex gap-2 flex-wrap mt-6">
+              <div className="flex gap-2 flex-wrap mt-4">
                 {msg.actions.map(a => (
-                  <Button
+                  <button
                     key={a.id}
                     onClick={() => handleAction(a.id)}
                     style={a.primary
-                      ? { backgroundColor: AGENTS[activeAgent].accent, borderColor: AGENTS[activeAgent].accent, color: '#171717', fontWeight: 600, borderRadius: '4px', display: 'flex', alignItems: 'center' }
-                      : { backgroundColor: '#f5f5f5', borderColor: 'transparent', color: '#404040', fontWeight: 600, borderRadius: '4px', display: 'flex', alignItems: 'center' }
+                      ? { backgroundColor: hexToRgba(AGENTS[activeAgent].accent, 0.8), color: '#171717', padding: '8px 16px', borderRadius: '4px', border: '1px solid transparent', fontSize: '15px', fontWeight: 600, letterSpacing: '0.2px', lineHeight: 1.33, cursor: 'pointer', transition: 'filter 0.15s ease, transform 0.1s ease' }
+                      : { backgroundColor: 'rgba(0,0,0,0.05)', color: 'rgba(0,0,0,0.95)', padding: '8px 16px', borderRadius: '4px', border: '1px solid transparent', fontSize: '15px', fontWeight: 600, letterSpacing: '0.2px', lineHeight: 1.33, cursor: 'pointer', transition: 'filter 0.15s ease, transform 0.1s ease' }
                     }
+                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.filter = 'brightness(0.92)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.filter = ''; }}
+                    onMouseDown={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(0.9)'; }}
+                    onMouseUp={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'none'; }}
                   >
                     {a.label}
-                  </Button>
+                  </button>
                 ))}
               </div>
             )}
@@ -271,6 +292,32 @@ export function UnifiedChatView({ initialAgent, onBack }: { initialAgent: AgentI
 
         <div className="flex-1 overflow-y-auto py-7 px-6 flex flex-col gap-6">
           {messages.map((msg, i) => renderMessage(msg, i))}
+          {draftState === 'done' && (
+            <div
+              className="flex gap-2 flex-wrap"
+              style={{
+                opacity: draftChosen !== null ? 1 : 0,
+                transform: draftChosen !== null ? 'translateY(0)' : 'translateY(6px)',
+                transition: 'opacity 0.2s ease, transform 0.2s ease',
+                pointerEvents: draftChosen !== null ? 'auto' : 'none',
+              }}
+            >
+              {[{ label: 'Send to team', primary: true, id: 'send-draft' }, { label: 'Edit draft', id: 'edit-exec-draft' }].map(a => (
+                <button
+                  key={a.id}
+                  onClick={() => handleAction(a.id)}
+                  style={a.primary
+                    ? { backgroundColor: hexToRgba(AGENTS[activeAgent].accent, 0.8), color: '#171717', padding: '8px 16px', borderRadius: '4px', border: '1px solid transparent', fontSize: '15px', fontWeight: 600, letterSpacing: '0.2px', lineHeight: 1.33, cursor: 'pointer', transition: 'filter 0.15s ease' }
+                    : { backgroundColor: 'rgba(0,0,0,0.05)', color: 'rgba(0,0,0,0.95)', padding: '8px 16px', borderRadius: '4px', border: '1px solid transparent', fontSize: '15px', fontWeight: 600, letterSpacing: '0.2px', lineHeight: 1.33, cursor: 'pointer', transition: 'filter 0.15s ease' }
+                  }
+                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.filter = 'brightness(0.92)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.filter = ''; }}
+                >
+                  {a.label}
+                </button>
+              ))}
+            </div>
+          )}
           <div ref={messagesEndRef} />
         </div>
 

@@ -1,4 +1,4 @@
-import { Button, Tabs } from 'antd';
+import { Tabs } from 'antd';
 import { AreaChart, Area, XAxis, YAxis, ReferenceLine, ResponsiveContainer } from 'recharts';
 import { weeklyData, revenueScenarios, ticketTiers } from '../../constants';
 import { BTrace } from './BTrace';
@@ -140,19 +140,6 @@ export function InsightsCanvas({ loading, draftState, draftChosen, rightTab, onT
               )}
             </div>
             <p className="text-sm text-neutral-700 leading-relaxed">{v.text}</p>
-            <Button
-              shape="round"
-              size="small"
-              type="primary"
-              onClick={e => { e.stopPropagation(); onChooseDraft(v.id); }}
-              style={{
-                alignSelf: 'flex-start',
-                backgroundColor: draftChosen === v.id ? '#13678A' : '#012030',
-                borderColor: draftChosen === v.id ? '#13678A' : '#012030',
-              }}
-            >
-              {draftChosen === v.id ? 'Chosen' : 'Use this'}
-            </Button>
           </div>
         ))}
       </div>
