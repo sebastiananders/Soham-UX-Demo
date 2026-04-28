@@ -3,7 +3,7 @@ import React from 'react';
 import { AgentAvatar } from '../app/components/AgentAvatar';
 
 const meta: Meta<typeof AgentAvatar> = {
-  title: 'App / Primitives / AgentAvatar',
+  title: 'Atoms / AgentAvatar',
   component: AgentAvatar,
   parameters: { layout: 'centered' },
   argTypes: {

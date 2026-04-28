@@ -1,0 +1,58 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="Introduction" />
+
+# Soham · Event Dashboard
+
+UI prototype for Soham — an AI event-management assistant built on Bizzabo. This Storybook is the component handoff for the frontend team.
+
+**Stack:** Vite + React + TypeScript · Tailwind CSS v4 · Ant Design v6
+
+---
+
+## How to navigate
+
+Stories are organised into three tiers, from big-picture to smallest piece:
+
+| Group | What's here |
+|---|---|
+| **Demo** | Full-screen canvas views — see each domain as it appears in the product |
+| **Components** | Functional UI sections: chat messages, home cards, progress metrics |
+| **Atoms** | Design tokens and primitives: colors, typography, buttons, avatars, loaders |
+
+---
+
+## Key patterns
+
+**Canvas-driven buttons** — Action buttons in chat only appear when the user selects something on the canvas panel. They use an `opacity` + `translateY` transition and `pointerEvents: none` when hidden. Never embed canvas-dependent actions inside static messages.
+
+**Unified agent identity** — All domain chats are answered by "Soham" with a single black Bizzabo avatar. Domain accent colors and chat names are kept for navigation context only.
+
+**Domain accents**
+
+| Domain | Color | Usage |
+|---|---|---|
+| Event website | `#FDE047` | Chat header badge, card accent |
+| Contact & tickets | `#C4B5FD` | Chat header badge, card accent |
+| Insights & reporting | `#34D399` | Chat header badge, card accent |
+
+---
+
+## Button styles
+
+All interactive buttons follow the same shape regardless of context:
+
+| Variant | Background | Text | Shape |
+|---|---|---|---|
+| Primary | `#0075de` | `#ffffff` | `8px 16px` · `4px` radius · `15px / 600` |
+| Secondary | `rgba(0,0,0,0.05)` | `rgba(0,0,0,0.95)` | same |
+
+Hover: `brightness(0.92)` · Active: `scale(0.9)`
+
+---
+
+## Links
+
+- [Live prototype](https://soham-ux-demo.vercel.app)
+- [This Storybook](https://soham-ux-storybook.vercel.app)
+- [GitHub](https://github.com/sebastiananders/Soham-UX-Demo)

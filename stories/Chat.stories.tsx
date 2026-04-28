@@ -150,7 +150,7 @@ function Pad({ children }: { children: React.ReactNode }) {
 
 // ─── Story definitions ────────────────────────────────────────────────────────
 
-export default { title: 'App / Chat' } satisfies Meta;
+export default { title: 'Components / Chat' } satisfies Meta;
 
 // Messages
 export const MessageAgent: StoryObj = {

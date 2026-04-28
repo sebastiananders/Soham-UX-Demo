@@ -7,7 +7,7 @@ import { InsightsCanvas } from '../app/components/InsightsCanvas';
 // ─── WebsiteCanvas ────────────────────────────────────────────────────────────
 
 export default {
-  title: 'App / Canvas',
+  title: 'Demo / Canvas',
 } satisfies Meta;
 
 export const Website: StoryObj = {

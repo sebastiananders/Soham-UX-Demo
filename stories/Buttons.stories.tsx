@@ -131,7 +131,7 @@ function ButtonsPage() {
 }
 
 const meta: Meta = {
-  title: 'Design System / Buttons',
+  title: 'Atoms / Buttons',
   component: ButtonsPage,
   parameters: { layout: 'fullscreen' },
 };

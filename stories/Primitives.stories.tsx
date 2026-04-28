@@ -6,7 +6,7 @@ import { AgentAvatar } from '../app/components/AgentAvatar';
 // ─── BTrace ──────────────────────────────────────────────────────────────────
 
 const btraceMeta: Meta<typeof BTrace> = {
-  title: 'App / Primitives / BTrace',
+  title: 'Atoms / BTrace',
   component: BTrace,
   parameters: { layout: 'centered' },
   argTypes: {

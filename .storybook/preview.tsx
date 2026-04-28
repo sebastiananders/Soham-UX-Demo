@@ -5,6 +5,7 @@ import antdTheme from '../antdTheme';
 import type { Preview } from '@storybook/react';
 
 const preview: Preview = {
+  tags: ['autodocs'],
   decorators: [
     (Story) => (
       <ConfigProvider theme={antdTheme}>
@@ -21,6 +22,14 @@ const preview: Preview = {
     },
     backgrounds: { disable: true },
     layout: 'fullscreen',
+    docs: {
+      canvas: { sourceState: 'shown' },
+    },
+    options: {
+      storySort: {
+        order: ['Introduction', 'Demo', 'Components', 'Atoms'],
+      },
+    },
   },
 };
 

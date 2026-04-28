@@ -143,7 +143,7 @@ function ProgressCarousel() {
 
 // ─── Story definitions ────────────────────────────────────────────────────────
 
-export default { title: 'App / Home' } satisfies Meta;
+export default { title: 'Components / Home' } satisfies Meta;
 
 // Agent Cards
 export const AgentCardInsights: StoryObj = {

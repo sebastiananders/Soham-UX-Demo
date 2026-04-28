@@ -68,7 +68,7 @@ function TypographyPage() {
 }
 
 const meta: Meta = {
-  title: 'Design System / Typography',
+  title: 'Atoms / Typography',
   component: TypographyPage,
   parameters: { layout: 'fullscreen' },
 };

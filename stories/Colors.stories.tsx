@@ -98,7 +98,7 @@ function ColorsPage() {
 }
 
 const meta: Meta = {
-  title: 'Design System / Colors',
+  title: 'Atoms / Colors',
   component: ColorsPage,
   parameters: { layout: 'fullscreen' },
 };
