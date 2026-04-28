@@ -36,7 +36,6 @@ const antdTheme: ThemeConfig = {
     },
     Badge: {
       fontSize: 10,
-      fontWeight: 600,
     },
     Tabs: {
       inkBarColor: '#030213',
