@@ -9,7 +9,7 @@ export interface ActionBtn {
 export type ChatMessage =
   | { kind: 'agent'; agentId: AgentId; text: string; time: string; actions?: ActionBtn[] }
   | { kind: 'user'; text: string; time: string }
-  | { kind: 'handoff'; from: AgentId; to: AgentId; time: string }
+
   | { kind: 'task-running'; label: string }
   | { kind: 'task-done'; label: string; summary: string };
 

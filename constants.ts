@@ -4,15 +4,14 @@ import type { AgentId, ChatMessage } from './types';
 
 export const AGENTS: Record<AgentId, {
   name: string;
-  displayName: string;
   sub: string;
   meta: string;
   accent: string;
   cardBg: string;
 }> = {
-  website:  { name: 'Speaker profiles',     displayName: 'Web Agent',      sub: 'Event website',        meta: '1d ago · Draft ready',       accent: '#FDE047', cardBg: '#FFFFFF' },
-  contacts: { name: 'Win warm contacts',    displayName: 'Contacts Agent', sub: 'Contact & tickets',    meta: '3d ago · 340 warm contacts', accent: '#C4B5FD', cardBg: '#FFFFFF' },
-  insights: { name: 'Registration insight', displayName: 'Insights Agent', sub: 'Insights & reporting', meta: '2h ago · 612 registrations', accent: '#34D399', cardBg: '#FFFFFF' },
+  website:  { name: 'Speaker profiles',     sub: 'Event website',        meta: '1d ago · Draft ready',       accent: '#FDE047', cardBg: '#FFFFFF' },
+  contacts: { name: 'Win warm contacts',    sub: 'Contact & tickets',    meta: '3d ago · 340 warm contacts', accent: '#C4B5FD', cardBg: '#FFFFFF' },
+  insights: { name: 'Registration insight', sub: 'Insights & reporting', meta: '2h ago · 612 registrations', accent: '#34D399', cardBg: '#FFFFFF' },
 };
 
 // ── Initial messages ───────────────────────────────────────────────────────────
