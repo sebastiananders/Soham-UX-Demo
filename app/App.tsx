@@ -1,12 +1,22 @@
 import React, { useState, useRef } from 'react';
-import { Home, Globe, Ticket, PieChart, Bell, Plus, Mic, Paperclip, MoreHorizontal, ChevronRight, X, ArrowUp, Bookmark, Shuffle } from 'lucide-react';
+import type { ChatMessage } from '../types';
+import { Home, Globe, Ticket, PieChart, Bell, Plus, Mic, Paperclip, MoreHorizontal, ChevronRight, X, ArrowUp, Bookmark } from 'lucide-react';
 import { Badge, Avatar } from 'antd';
 import imgLogo from "../imports/DeviceMacBookPro14/c4121c79ef3207dcf24c7435552bb7378ad17369.png";
 import imgProfile from "./assets/aria.jpg";
 import { Illustration } from './components/FigmaIcons';
 import { UnifiedChatView } from './components/UnifiedChatView';
+import { LivestreamCanvas } from './components/LivestreamCanvas';
 import { AgentAvatar } from './components/AgentAvatar';
 import type { AgentId, HistoryItem } from '../types';
+
+interface FindingSession {
+  title: string;
+  badge: string;
+  badgeColor: string;
+  agentId: AgentId;
+  messages: ChatMessage[];
+}
 import { AGENTS, INITIAL_MESSAGES } from '../constants';
 
 const PROGRESS_METRICS = [
@@ -36,15 +46,21 @@ export default function App() {
   const [bookmarked, setBookmarked] = useState<Set<AgentId>>(new Set());
   const [progressIdx, setProgressIdx] = useState(0);
   const [progressAnimating, setProgressAnimating] = useState(false);
+  const [activeFinding, setActiveFinding] = useState<FindingSession | null>(null);
+  const [livestreamState, setLivestreamState] = useState<'diagnosed' | 'fixed'>('diagnosed');
 
-  const shuffleProgress = () => {
-    setProgressAnimating(true);
-    setTimeout(() => {
-      setProgressIdx(i => (i + 1 + Math.floor(Math.random() * (PROGRESS_METRICS.length - 1))) % PROGRESS_METRICS.length);
-      setProgressAnimating(false);
-    }, 200);
-  };
   const inputRef = useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    const id = setInterval(() => {
+      setProgressAnimating(true);
+      setTimeout(() => {
+        setProgressIdx(i => (i + 1) % PROGRESS_METRICS.length);
+        setProgressAnimating(false);
+      }, 200);
+    }, 4000);
+    return () => clearInterval(id);
+  }, []);
 
   const pillSuggestions = [
     { label: 'Create a new ticket category', full: 'Create a new ticket category for group registrations with a 10% discount for teams of 5 or more.' },
@@ -64,6 +80,17 @@ export default function App() {
   };
 
   const handleBack = () => {
+    if (activeFinding) {
+      setChatHistory(prev => {
+        const alreadyExists = prev.some(h => h.agentId === activeFinding.agentId && h.title === activeFinding.title);
+        if (alreadyExists) return prev;
+        const preview = activeFinding.messages[0]?.kind === 'agent' ? activeFinding.messages[0].text.slice(0, 50) + '…' : '';
+        return [{ id: Date.now().toString(), agentId: activeFinding.agentId, title: activeFinding.title, preview }, ...prev];
+      });
+      setActiveFinding(null);
+      setLivestreamState('diagnosed');
+      return;
+    }
     if (activeSession) {
       const agent = AGENTS[activeSession];
       setChatHistory(prev => {
@@ -100,10 +127,10 @@ export default function App() {
         </div>
 
         <nav className="flex flex-col w-full px-2 gap-2">
-          {/* Active chats section */}
+          {/* Shortcuts section */}
           <button onClick={() => !collapsed && setActiveChatsOpen(v => !v)}
             className={`flex items-center justify-between px-3 py-1.5 w-full rounded-md ${!collapsed ? 'hover:bg-neutral-50 transition-colors' : ''}`}>
-            <span className={`text-xs font-medium text-neutral-400 whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`} style={{ transitionDelay: collapsed ? '0ms' : '200ms' }}>Active chats</span>
+            <span className={`text-xs font-medium text-neutral-400 whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`} style={{ transitionDelay: collapsed ? '0ms' : '200ms' }}>Shortcuts</span>
             {!collapsed && (
               <ChevronRight className={`w-3 h-3 text-neutral-300 transition-transform duration-200 ${activeChatsOpen ? 'rotate-90' : ''}`} />
             )}
@@ -123,23 +150,13 @@ export default function App() {
                   </div>
                   {item.awaiting && <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />}
                 </div>
-                <div className={`flex flex-col min-w-0 transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`} style={{ transitionDelay: collapsed ? '0ms' : '200ms' }}>
-                  <span className="whitespace-nowrap text-sm">{item.label}</span>
-                  <span className="whitespace-nowrap text-[10px] text-neutral-400 font-normal mt-0.5">{item.meta}</span>
-                </div>
+                <span className={`whitespace-nowrap text-sm transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`} style={{ transitionDelay: collapsed ? '0ms' : '200ms' }}>{item.label}</span>
               </a>
             );
           })}
 
-          <button onClick={() => setActiveSession(null)}
-            className="flex items-center gap-2.5 px-3 py-2.5 rounded-md w-full text-sm text-neutral-400 hover:bg-neutral-50 hover:text-neutral-600 transition-colors">
-            <div className={`rounded-[7px] flex items-center justify-center bg-neutral-100 transition-all duration-200 shrink-0 ${collapsed ? 'w-5 h-5 rounded-[5px]' : 'w-7 h-7'}`}>
-              <Plus className={`transition-all duration-200 ${collapsed ? 'w-2.5 h-2.5' : 'w-3.5 h-3.5'}`} />
-            </div>
-            <span className={`whitespace-nowrap text-sm transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`} style={{ transitionDelay: collapsed ? '0ms' : '200ms' }}>Start a new chat</span>
-          </button>
 
-          {/* Recent chats section */}
+{/* Recent chats section */}
           <button onClick={() => !collapsed && setRecentChatsOpen(v => !v)}
             className={`flex items-center justify-between px-3 pt-3 pb-1.5 w-full rounded-md ${!collapsed ? 'hover:bg-neutral-50 transition-colors' : ''}`}>
             <span className={`text-xs font-medium text-neutral-400 whitespace-nowrap transition-opacity duration-150 ${collapsed ? 'opacity-0' : 'opacity-100'}`} style={{ transitionDelay: collapsed ? '0ms' : '200ms' }}>Recent chats</span>
@@ -220,7 +237,22 @@ export default function App() {
       {/* Main Content */}
       <main className="flex-1 relative flex flex-col items-center overflow-hidden">
 
-        {activeSession ? (
+        {activeFinding ? (
+          <UnifiedChatView
+            key={activeFinding.title}
+            initialAgent={activeFinding.agentId}
+            onBack={handleBack}
+            hideCanvas={activeFinding.agentId !== 'website' || activeFinding.badge !== 'Critical'}
+            chatTitle={activeFinding.title}
+            chatBadge={activeFinding.badge}
+            chatBadgeColor={activeFinding.badgeColor}
+            overrideMessages={activeFinding.messages}
+            canvasNode={activeFinding.badge === 'Critical' ? <LivestreamCanvas state={livestreamState} /> : undefined}
+            onFindingAction={(id) => {
+              if (id === 'fix-now') setLivestreamState('fixed');
+            }}
+          />
+        ) : activeSession ? (
           <UnifiedChatView key={activeSession} initialAgent={activeSession} onBack={handleBack} />
         ) : (
           <>
@@ -238,61 +270,104 @@ export default function App() {
                   <h1 className="text-[42px] font-normal text-neutral-900 tracking-tight" style={{ fontFamily: 'GalaxieCopernicus, serif' }}>Aloha, Jen</h1>
                   {/* <p className="text-base text-neutral-400">What shall we do today?</p> */}
                 </div>
-                <div className="flex items-center gap-4 w-[70%] border border-transparent bg-neutral-50 rounded-2xl px-8 py-5">
-                  <span className="text-sm text-neutral-500 whitespace-nowrap shrink-0 transition-opacity duration-200" style={{ opacity: progressAnimating ? 0 : 1 }}>
-                    {PROGRESS_METRICS[progressIdx].left}
-                  </span>
-                  <div className="flex-1 h-1 bg-neutral-200 rounded-full overflow-hidden">
-                    <div className={`h-full ${PROGRESS_METRICS[progressIdx].color} rounded-full transition-all duration-500 ease-out`} style={{ width: progressAnimating ? '0%' : `${PROGRESS_METRICS[progressIdx].pct}%` }} />
+                <div className="flex flex-col items-center gap-3 w-[70%]">
+                  <div className="flex items-center gap-4 w-full border border-transparent bg-neutral-50 rounded-2xl px-8 py-5">
+                    <span className="text-sm text-neutral-500 whitespace-nowrap shrink-0 transition-opacity duration-200" style={{ opacity: progressAnimating ? 0 : 1 }}>
+                      {PROGRESS_METRICS[progressIdx].left}
+                    </span>
+                    <div className="flex-1 h-1 bg-neutral-200 rounded-full overflow-hidden">
+                      <div className={`h-full ${PROGRESS_METRICS[progressIdx].color} rounded-full transition-all duration-500 ease-out`} style={{ width: progressAnimating ? '0%' : `${PROGRESS_METRICS[progressIdx].pct}%` }} />
+                    </div>
+                    <span className="text-sm whitespace-nowrap shrink-0 transition-opacity duration-200" style={{ opacity: progressAnimating ? 0 : 1 }}>
+                      <strong className="font-semibold text-neutral-700">{PROGRESS_METRICS[progressIdx].right}</strong>
+                      <span className="text-neutral-500"> · {PROGRESS_METRICS[progressIdx].sub}</span>
+                    </span>
                   </div>
-                  <span className="text-sm whitespace-nowrap shrink-0 transition-opacity duration-200" style={{ opacity: progressAnimating ? 0 : 1 }}>
-                    <strong className="font-semibold text-neutral-700">{PROGRESS_METRICS[progressIdx].right}</strong>
-                    <span className="text-neutral-500"> · {PROGRESS_METRICS[progressIdx].sub}</span>
-                  </span>
-                  <button onClick={shuffleProgress} className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-blue-500 hover:text-blue-600 hover:bg-neutral-50 transition-colors">
-                    <Shuffle className="w-3.5 h-3.5" />
-                  </button>
+                  <div className="flex items-center gap-1">
+                    {PROGRESS_METRICS.map((_, i) => (
+                      <button key={i} onClick={() => { setProgressAnimating(true); setTimeout(() => { setProgressIdx(i); setProgressAnimating(false); }, 200); }} className="rounded-full transition-all duration-300" style={{ width: i === progressIdx ? 16 : 5, height: 5, backgroundColor: i === progressIdx ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.12)' }} />
+                    ))}
+                  </div>
                 </div>
               </div>
 
-              {/* <div className="w-full border-t border-neutral-200 mt-6" /> */}
-
-              {/* Agent Cards */}
-              <div className="flex gap-3 justify-center w-full mt-12">
-                {([
-                  { id: 'insights' as AgentId, title: 'See event insights', stat: '61%', statLabel: 'of seat target', desc: "At 612 registrations with velocity climbing week over week. Projecting 720–780 total before early-bird ends.",  badge: 'Insights & reporting', cta: 'Share insight'  },
-                  { id: 'contacts' as AgentId, title: 'Win warm contacts',  stat: '340', statLabel: 'warm contacts',  desc: "Contacts opened your invite but haven't registered. Early-bird closes in 3 days — email is ready to send.",  badge: 'Contact & tickets',    cta: 'Draft mail'     },
-                  { id: 'website'  as AgentId, title: 'Add speaker bio',    stat: '1',   statLabel: 'bio ready',      desc: "Dr. Sarah Chen's profile is missing from the speakers page. Bio is drafted and reviewed — ready to publish.", badge: 'Event website',        cta: 'Publish bio'    },
-                ]).map(card => (
-                  <div key={card.id} onClick={() => openAgent(card.id)}
-                    className="rounded-[0.85175rem] flex flex-col w-[290px] shrink-0 cursor-pointer overflow-hidden hover:shadow-lg transition-all duration-150"
-                    style={{
-                      backgroundColor: AGENTS[card.id].cardBg,
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                    }}>
-                    {/* Card body */}
-                    <div className="p-5 flex flex-col">
-                      {/* Title */}
-                      <h3 className="text-[19px] font-bold leading-tight" style={{ color: '#171717' }}>{card.title}</h3>
-                      {/* Category label */}
-                      <div className="flex items-center mt-2">
-                        <span className="text-[10px] font-semibold tracking-widest uppercase leading-none px-2 py-1" style={{ backgroundColor: `${AGENTS[card.id].accent}80`, color: '#171717', borderRadius: '2px' }}>{card.badge}</span>
-                      </div>
-                      {/* Body */}
-                      <p className="mt-4 text-[13px] leading-relaxed line-clamp-3" style={{ color: '#6B7280' }}>{card.desc}</p>
-                      {/* Divider */}
-                      <div className="border-t mt-3" style={{ borderColor: '#E5E7EB' }} />
-                      {/* Stat + CTA */}
-                      <div className="flex items-center justify-between mt-3">
-                        <div>
-                          <p className="text-[10px] leading-none mb-1" style={{ color: 'rgba(0,0,0,0.5)' }}>{card.statLabel}</p>
-                          <p className="text-[32px] font-bold leading-none tracking-tight" style={{ color: '#171717' }}>{card.stat}</p>
+              {/* Findings */}
+              <div className="flex flex-col items-center gap-4 w-full mt-12">
+                <div className="flex flex-col items-center gap-0.5">
+                  <p className="text-xs font-semibold tracking-widest uppercase text-neutral-400">Your updates</p>
+                  <p className="text-xs text-neutral-300">{new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })} · {new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</p>
+                </div>
+                <div className="flex gap-3 justify-center w-full">
+                  {([
+                    {
+                      id: 'website' as AgentId,
+                      title: 'Live stream is down',
+                      stat: '1.2k',
+                      statLabel: 'virtual attendees waiting',
+                      desc: 'The stream URL on the event page returns a 404. Virtual attendees are seeing an error. The correct CDN link is available and ready to push.',
+                      cta: 'Fix now',
+                      urgency: 'critical' as const,
+                    },
+                    {
+                      id: 'contacts' as AgentId,
+                      title: 'Speakers not on-site yet',
+                      stat: '2',
+                      statLabel: 'speakers not checked in',
+                      desc: 'Dr. Müller and Ana Costa are unconfirmed with 55 minutes to their session. Last contact was this morning — a follow-up message is ready to send.',
+                      cta: 'Send message',
+                      urgency: 'important' as const,
+                    },
+                    {
+                      id: 'insights' as AgentId,
+                      title: 'Check-in stalling, floor 2',
+                      stat: '23%',
+                      statLabel: 'of level 2 checked in',
+                      desc: 'Floor 2 registrations are lagging behind floors 1 and 3 by 40 minutes. Staff reallocation or a PA announcement could clear the queue before the keynote.',
+                      cta: 'See details',
+                      urgency: 'heads-up' as const,
+                    },
+                  ]).map(card => {
+                    const URGENCY = {
+                      'critical':  { label: 'Critical',  color: '#FCA5A5' },
+                      'important': { label: 'Important', color: '#FDE047' },
+                      'heads-up':  { label: 'Heads up',  color: '#6EE7B7' },
+                    };
+                    const u = URGENCY[card.urgency];
+                    const handleCardClick = () => {
+                      const t = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+                      setActiveFinding({
+                        title: card.title,
+                        badge: u.label,
+                        badgeColor: `${u.color}80`,
+                        agentId: card.id,
+                        messages: card.urgency === 'critical'
+                          ? [{ kind: 'agent', agentId: card.id, text: "The stream URL on the event page is returning a 404 — virtual attendees are seeing an error right now. I have the correct CDN endpoint ready to push. This takes about 10 seconds.", time: t, actions: [{ label: 'Fix now', primary: true, id: 'finding-primary' }, { label: 'Tell me more', id: 'finding-secondary' }] }]
+                          : [{ kind: 'agent', agentId: card.id, text: card.desc + ' What would you like to do?', time: t, actions: [{ label: card.cta, primary: true, id: 'finding-primary' }, { label: 'Tell me more', id: 'finding-secondary' }] }],
+                      });
+                    };
+                    return (
+                      <div key={card.id} onClick={handleCardClick}
+                        className="rounded-[0.85175rem] flex flex-col w-[290px] shrink-0 cursor-pointer overflow-hidden hover:shadow-lg transition-all duration-150"
+                        style={{ backgroundColor: '#ffffff', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+                        <div className="p-5 flex flex-col">
+                          <h3 className="text-[19px] font-bold leading-tight truncate" style={{ color: '#171717' }}>{card.title}</h3>
+                          <div className="flex items-center mt-2">
+                            <span className="text-[10px] font-semibold tracking-widest uppercase leading-none px-2 py-1" style={{ backgroundColor: `${u.color}80`, color: '#171717', borderRadius: '2px' }}>{u.label}</span>
+                          </div>
+                          <p className="mt-4 text-[13px] leading-relaxed line-clamp-3" style={{ color: '#6B7280' }}>{card.desc}</p>
+                          <div className="border-t mt-3" style={{ borderColor: '#E5E7EB' }} />
+                          <div className="flex items-center justify-between mt-3">
+                            <div>
+                              <p className="text-[10px] leading-none mb-1" style={{ color: 'rgba(0,0,0,0.5)' }}>{card.statLabel}</p>
+                              <p className="text-[32px] font-bold leading-none tracking-tight" style={{ color: '#171717' }}>{card.stat}</p>
+                            </div>
+                            <span className="text-[12px] font-normal px-4 py-2" style={{ color: '#171717', backgroundColor: 'rgba(0,0,0,0.03)', borderRadius: '4px' }}>{card.cta}</span>
+                          </div>
                         </div>
-                        <span className="text-[12px] font-normal px-4 py-2" style={{ color: '#171717', backgroundColor: 'rgba(0,0,0,0.03)', borderRadius: '4px' }}>{card.cta}</span>
                       </div>
-                    </div>
-                  </div>
-                ))}
+                    );
+                  })}
+                </div>
               </div>
             </div>
 

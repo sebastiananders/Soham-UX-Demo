@@ -10,10 +10,30 @@ import { ContactsCanvas } from './ContactsCanvas';
 import { InsightsCanvas } from './InsightsCanvas';
 
 
-export function UnifiedChatView({ initialAgent, onBack }: { initialAgent: AgentId; onBack: () => void }) {
-  const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_MESSAGES[initialAgent]);
+export function UnifiedChatView({
+  initialAgent,
+  onBack,
+  hideCanvas = false,
+  chatTitle,
+  chatBadge,
+  chatBadgeColor,
+  overrideMessages,
+  canvasNode,
+  onFindingAction,
+}: {
+  initialAgent: AgentId;
+  onBack: () => void;
+  hideCanvas?: boolean;
+  chatTitle?: string;
+  chatBadge?: string;
+  chatBadgeColor?: string;
+  overrideMessages?: ChatMessage[];
+  canvasNode?: React.ReactNode;
+  onFindingAction?: (id: string) => void;
+}) {
+  const [messages, setMessages] = useState<ChatMessage[]>(overrideMessages ?? INITIAL_MESSAGES[initialAgent]);
   const [inputValue, setInputValue] = useState('');
-  const [canvasVisible] = useState(true);
+  const [canvasVisible, setCanvasVisible] = useState(!canvasNode);
 
   const activeAgent = initialAgent;
 
@@ -104,6 +124,56 @@ export function UnifiedChatView({ initialAgent, onBack }: { initialAgent: AgentI
         setDraftState('done');
         setRightTab('draft');
       }, 3000);
+    } else if (id === 'finding-primary') {
+      // Path A: Fix now (immediate)
+      addMessages([
+        { kind: 'user', text: 'Fix now', time: t },
+        { kind: 'agent', agentId: activeAgent, text: "On it — pushing the correct CDN URL to the live page now.", time: t },
+        { kind: 'task-running', label: 'Updating stream URL on event page…' },
+      ]);
+      onFindingAction?.('fix-now');
+      setTimeout(() => {
+        setMessages(prev => {
+          const next = prev.filter(m => m.kind !== 'task-running');
+          return [
+            ...next,
+            { kind: 'task-done', label: 'Stream URL updated · live page redeployed', summary: 'cdn.bizzabo.com/techsummit-2026/live is now live' },
+            { kind: 'agent', agentId: activeAgent, text: "Done. The stream is live — 1,247 virtual attendees now have access. You can verify on the right.", time: now() },
+          ];
+        });
+        setCanvasVisible(true);
+      }, 2000);
+    } else if (id === 'finding-secondary') {
+      // Path B: Tell me more
+      addMessages([
+        { kind: 'user', text: 'Tell me more', time: t },
+        { kind: 'agent', agentId: activeAgent, text: "The event page is pointing to stream.techsummit.io/live, which was decommissioned yesterday when you switched CDN providers. The correct URL is cdn.bizzabo.com/techsummit-2026/live. Attendees have been hitting the error for about 14 minutes. The fix takes roughly 10 seconds.", time: t, actions: [{ label: 'Fix now', primary: true, id: 'finding-fix-after-diagnose' }, { label: 'Copy correct URL', id: 'finding-copy-url' }] },
+      ]);
+      onFindingAction?.('tell-me-more');
+      setCanvasVisible(true);
+    } else if (id === 'finding-fix-after-diagnose') {
+      // Path B → fix
+      addMessages([
+        { kind: 'user', text: 'Fix now', time: t },
+        { kind: 'agent', agentId: activeAgent, text: "On it — pushing the correct CDN URL to the live page now.", time: t },
+        { kind: 'task-running', label: 'Updating stream URL on event page…' },
+      ]);
+      onFindingAction?.('fix-now');
+      setTimeout(() => {
+        setMessages(prev => {
+          const next = prev.filter(m => m.kind !== 'task-running');
+          return [
+            ...next,
+            { kind: 'task-done', label: 'Stream URL updated · live page redeployed', summary: 'cdn.bizzabo.com/techsummit-2026/live is now live' },
+            { kind: 'agent', agentId: activeAgent, text: "Done. The stream is live — 1,247 virtual attendees now have access.", time: now() },
+          ];
+        });
+      }, 2000);
+    } else if (id === 'finding-copy-url') {
+      addMessages([
+        { kind: 'user', text: 'Copy correct URL', time: t },
+        { kind: 'agent', agentId: activeAgent, text: "Copied to clipboard: cdn.bizzabo.com/techsummit-2026/live", time: t },
+      ]);
     }
   };
 
@@ -203,9 +273,9 @@ export function UnifiedChatView({ initialAgent, onBack }: { initialAgent: AgentI
   };
 
   return (
-    <div className="flex h-screen w-full">
+    <div className={`flex h-screen w-full ${!canvasVisible ? 'justify-center' : ''}`}>
       {/* ── Left: Chat panel ── */}
-      <div className="w-[400px] shrink-0 flex flex-col border-r border-neutral-100">
+      <div className={`${!canvasVisible ? 'w-1/2' : 'w-[400px] shrink-0 border-r border-neutral-100'} flex flex-col`}>
         <header className="flex items-center gap-3 px-6 py-5 shrink-0 relative transition-colors duration-300"
           style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid #E5E7EB' }}>
           <Button
@@ -215,9 +285,9 @@ export function UnifiedChatView({ initialAgent, onBack }: { initialAgent: AgentI
             style={{ width: 34, height: 34, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, color: 'rgba(0,0,0,0.5)', flexShrink: 0 }}
           />
           <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-semibold tracking-widest uppercase leading-none px-2 py-1 self-start" style={{ backgroundColor: `${AGENTS[activeAgent].accent}80`, color: '#171717', borderRadius: '4px' }}>{agentInfo.sub}</span>
-            <h2 className="font-bold text-[18px] leading-tight" style={{ color: '#171717' }}>{agentInfo.name}</h2>
-            <span className="text-[12px] font-medium" style={{ color: '#9CA3AF' }}>{agentInfo.meta}</span>
+            <span className="text-[10px] font-semibold tracking-widest uppercase leading-none px-2 py-1 self-start" style={{ backgroundColor: chatBadgeColor ?? `${AGENTS[activeAgent].accent}80`, color: '#171717', borderRadius: '4px' }}>{chatBadge ?? agentInfo.sub}</span>
+            <h2 className="font-bold text-[18px] leading-tight" style={{ color: '#171717' }}>{chatTitle ?? agentInfo.name}</h2>
+            {!chatTitle && <span className="text-[12px] font-medium" style={{ color: '#9CA3AF' }}>{agentInfo.meta}</span>}
           </div>
         </header>
 
@@ -281,20 +351,34 @@ export function UnifiedChatView({ initialAgent, onBack }: { initialAgent: AgentI
       </div>
 
       {/* ── Right: Canvas ── */}
-      <div className="flex-1 flex flex-col overflow-hidden transition-opacity duration-300" style={{ opacity: canvasVisible ? 1 : 0 }}>
-        {activeAgent === 'website' && <WebsiteCanvas />}
-        {activeAgent === 'contacts' && <ContactsCanvas />}
-        {activeAgent === 'insights' && (
-          <InsightsCanvas
-            loading={insightsLoading}
-            draftState={draftState}
-            draftChosen={draftChosen}
-            rightTab={rightTab}
-            onTabChange={setRightTab}
-            onChooseDraft={i => setDraftChosen(i === draftChosen ? null : i)}
-          />
-        )}
-      </div>
+      {!hideCanvas && (
+        <div
+          className="flex flex-col overflow-hidden"
+          style={{
+            flex: canvasVisible ? 1 : 0,
+            opacity: canvasVisible ? 1 : 0,
+            transition: 'flex 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease',
+            minWidth: 0,
+          }}
+        >
+          {canvasNode ?? (
+            <>
+              {activeAgent === 'website' && <WebsiteCanvas />}
+              {activeAgent === 'contacts' && <ContactsCanvas />}
+              {activeAgent === 'insights' && (
+                <InsightsCanvas
+                  loading={insightsLoading}
+                  draftState={draftState}
+                  draftChosen={draftChosen}
+                  rightTab={rightTab}
+                  onTabChange={setRightTab}
+                  onChooseDraft={i => setDraftChosen(i === draftChosen ? null : i)}
+                />
+              )}
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }
