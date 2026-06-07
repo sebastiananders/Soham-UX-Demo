@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bell, ChevronLeft, ChevronRight, Search, PieChart, Globe, Ticket, List, LayoutGrid, CalendarDays } from 'lucide-react';
+import { Bell, ChevronLeft, ChevronRight, Search, PieChart, Globe, Ticket, List, LayoutGrid, CalendarDays, Shield } from 'lucide-react';
 import { Badge, Avatar } from 'antd';
 import { startOfMonth, endOfMonth, eachDayOfInterval, getDay, format, addMonths, subMonths, isSameDay, isWithinInterval, startOfDay } from 'date-fns';
 import imgLogo from '../../imports/DeviceMacBookPro14/c4121c79ef3207dcf24c7435552bb7378ad17369.png';
@@ -30,6 +30,7 @@ const ACTIVITY_ICON: Record<AgentId, React.ComponentType<{ className?: string }>
   insights: PieChart,
   website: Globe,
   contacts: Ticket,
+  analyzer: Shield,
 };
 
 type EventRow = typeof EVENTS[0];

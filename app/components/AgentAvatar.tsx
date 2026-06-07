@@ -7,6 +7,7 @@ const AVATAR_ICON: Record<AgentId, string> = {
   website:  speakerIcon,
   contacts: warmContactsIcon,
   insights: regInsightIcon,
+  analyzer: regInsightIcon,
 };
 
 export function AgentAvatar({ agentId, size = 20 }: { agentId: AgentId; size?: number }) {
