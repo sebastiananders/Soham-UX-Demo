@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Asset Management Asia Forum — Soham</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #0066cc;
+      --primary-focus: #0071e3;
+      --primary-on-dark: #2997ff;
+      --ink: #1d1d1f;
+      --ink-muted-80: #333333;
+      --ink-muted-48: #7a7a7a;
+      --divider-soft: #f0f0f0;
+      --hairline: #e0e0e0;
+      --canvas: #ffffff;
+      --canvas-parchment: #f5f5f7;
+      --surface-pearl: #fafafc;
+      --surface-tile-1: #272729;
+      --surface-black: #000000;
+      --surface-chip: #d2d2d7;
+      --on-primary: #ffffff;
+      --on-dark: #ffffff;
+      --status-critical: #ff3b30;
+      --status-warning: #ff9500;
+      --status-clean: #34c759;
+      --status-past: #8e8e93;
+    }
+
+    body {
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      background: var(--canvas-parchment);
+      color: var(--ink);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Global nav */
+    .global-nav {
+      background: #000000;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      padding: 0 32px;
+      gap: 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      flex-shrink: 0;
+    }
+    .global-nav .logo {
+      font-family: "SF Pro Display", system-ui, -apple-system, sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      color: #ffffff;
+      text-decoration: none;
+    }
+    .global-nav .back-link {
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      font-size: 12px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.72);
+      text-decoration: none;
+      letter-spacing: -0.12px;
+      line-height: 1.0;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.15s;
+    }
+    .global-nav .back-link:hover { color: #ffffff; }
+    .global-nav nav {
+      display: flex;
+      gap: 24px;
+      margin-left: auto;
+    }
+    .global-nav nav a {
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      font-size: 12px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.72);
+      text-decoration: none;
+      letter-spacing: -0.12px;
+      line-height: 1.0;
+      transition: color 0.15s;
+    }
+    .global-nav nav a:hover { color: #ffffff; }
+
+    /* Sub nav — frosted */
+    .sub-nav {
+      background: rgba(245,245,247,0.88);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      height: 52px;
+      display: flex;
+      align-items: center;
+      padding: 0 32px;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      position: sticky;
+      top: 44px;
+      z-index: 99;
+      flex-shrink: 0;
+    }
+    .sub-nav-center {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      pointer-events: none;
+    }
+    .sub-nav .event-title {
+      font-family: "SF Pro Display", system-ui, -apple-system, sans-serif;
+      font-size: 21px;
+      font-weight: 600;
+      line-height: 1.19;
+      letter-spacing: 0.231px;
+      color: var(--ink);
+    }
+    .sub-nav .event-date {
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ink-muted-48);
+      letter-spacing: -0.12px;
+    }
+
+    /* button-dark-utility */
+    .sub-nav .btn-new-chat {
+      background: #1d1d1f;
+      color: #ffffff;
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      letter-spacing: -0.224px;
+      line-height: 1.29;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 15px;
+      cursor: pointer;
+      text-decoration: none;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      transition: background 0.15s;
+    }
+    .sub-nav .btn-new-chat:hover { background: #000000; }
+    .sub-nav .btn-new-chat:active { transform: scale(0.95); }
+
+    /* Layout */
+    .body-layout {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 240px;
+      flex-shrink: 0;
+      background: var(--canvas);
+      border-right: 1px solid var(--hairline);
+      display: flex;
+      flex-direction: column;
+      padding: 24px 16px;
+      overflow-y: auto;
+    }
+    .sidebar-label {
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink-muted-48);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      padding-left: 4px;
+    }
+
+    .chat-history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .chat-history-item {
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      text-decoration: none;
+      color: inherit;
+      transition: background 0.15s;
+    }
+    .chat-history-item:hover { background: var(--canvas-parchment); }
+    .chat-name {
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: -0.12px;
+      color: var(--ink);
+    }
+    .chat-preview {
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ink-muted-48);
+      letter-spacing: -0.08px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .chat-time {
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      font-size: 11px;
+      color: var(--ink-muted-48);
+      margin-top: 1px;
+    }
+
+    /* Main content */
+    .main-content {
+      flex: 1;
+      min-width: 0;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 32px;
+    }
+    .main-inner {
+      width: 100%;
+      max-width: 640px;
+    }
+
+    /* Greeting */
+    .greeting {
+      margin-bottom: 32px;
+    }
+    .greeting-hello {
+      font-family: "SF Pro Display", system-ui, -apple-system, sans-serif;
+      font-size: 40px;
+      font-weight: 600;
+      line-height: 1.1;
+      letter-spacing: 0;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+    .greeting-context {
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      font-size: 17px;
+      font-weight: 400;
+      line-height: 1.47;
+      letter-spacing: -0.374px;
+      color: var(--ink-muted-48);
+    }
+
+    /* Critical banner — hidden */
+    .critical-banner {
+      display: none;
+      background: rgba(255,59,48,0.07);
+      border: 1px solid rgba(255,59,48,0.25);
+      border-radius: 18px;
+      padding: 20px 24px;
+      margin-bottom: 16px;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .critical-icon {
+      font-size: 22px;
+      flex-shrink: 0;
+      line-height: 1;
+      margin-top: 1px;
+    }
+    .critical-title {
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.374px;
+      color: var(--status-critical);
+      margin-bottom: 6px;
+    }
+    .critical-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .critical-list li {
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--status-critical);
+      letter-spacing: -0.224px;
+      line-height: 1.43;
+      padding-left: 12px;
+      position: relative;
+    }
+    .critical-list li::before {
+      content: "·";
+      position: absolute;
+      left: 0;
+      color: var(--status-critical);
+    }
+
+    /* Analyzer card — store-utility-card */
+    .analyzer-card {
+      background: var(--canvas);
+      border: 1px solid var(--hairline);
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 16px;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      transition: border-color 0.2s;
+    }
+    .analyzer-card:hover { border-color: #c0c0c5; }
+    .analyzer-card:active { transform: scale(0.99); }
+
+    .analyzer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .analyzer-label {
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 1.0;
+      letter-spacing: -0.12px;
+      color: var(--ink-muted-48);
+      text-transform: uppercase;
+    }
+    .analyzer-action {
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.43;
+      letter-spacing: -0.224px;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .analyzer-title {
+      font-family: "SF Pro Display", system-ui, -apple-system, sans-serif;
+      font-size: 21px;
+      font-weight: 600;
+      line-height: 1.19;
+      letter-spacing: 0.231px;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+    .analyzer-summary {
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      font-size: 17px;
+      font-weight: 400;
+      line-height: 1.47;
+      letter-spacing: -0.374px;
+      color: var(--ink-muted-48);
+      margin-bottom: 20px;
+    }
+
+    .analyzer-stats {
+      display: flex;
+      gap: 12px;
+    }
+    .stat-chip {
+      flex: 1;
+      background: var(--canvas-parchment);
+      border-radius: 11px;
+      padding: 12px 14px;
+    }
+    .stat-chip .stat-label {
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ink-muted-48);
+      letter-spacing: -0.12px;
+      margin-bottom: 2px;
+    }
+    .stat-chip .stat-value {
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      font-size: 17px;
+      font-weight: 600;
+      line-height: 1.24;
+      letter-spacing: -0.374px;
+    }
+    .stat-value.red   { color: var(--status-critical); }
+    .stat-value.amber { color: var(--status-warning); }
+    .stat-value.green { color: var(--status-clean); }
+    .stat-value.ink   { color: var(--ink); }
+
+    .analyzer-footer {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--hairline);
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.43;
+      letter-spacing: -0.224px;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Prompt wrap — inline, no frosted */
+    .prompt-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--canvas);
+      border: 1px solid var(--hairline);
+      border-radius: 18px;
+      padding: 12px 16px;
+      margin-top: 8px;
+      transition: border-color 0.15s;
+    }
+    .prompt-wrap:focus-within { border-color: var(--primary-focus); }
+    .prompt-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      height: 44px;
+      padding: 0 8px;
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      font-size: 17px;
+      font-weight: 400;
+      line-height: 1.47;
+      letter-spacing: -0.374px;
+      color: var(--ink);
+      outline: none;
+    }
+    .prompt-input::placeholder { color: var(--ink-muted-48); }
+
+    /* Send button — dark utility circular */
+    .btn-send {
+      background: #1d1d1f;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      width: 36px;
+      height: 36px;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .btn-send:hover { background: #000000; }
+    .btn-send:active { transform: scale(0.95); }
+
+    /* Status dot colors */
+    .dot-critical { background: var(--status-critical); }
+    .dot-warning  { background: var(--status-warning); }
+    .dot-clean    { background: var(--status-clean); }
+    .dot-past     { background: var(--status-past); }
+  </style>
+</head>
+<body>
+
+  <!-- Global nav -->
+  <header class="global-nav">
+    <a href="index.html" class="logo">Soham</a>
+    <a href="index.html" class="back-link">‹ My Events</a>
+  </header>
+
+  <!-- Sub nav — frosted -->
+  <div class="sub-nav">
+    <a href="chat-new.html" class="btn-new-chat">+ New Chat</a>
+    <div class="sub-nav-center">
+      <span class="event-title">Asset Management Asia Forum</span>
+      <span class="event-date">May 6, 2026 · Singapore</span>
+    </div>
+  </div>
+
+  <div class="body-layout">
+
+    <!-- Sidebar: Recent chats -->
+    <aside class="sidebar">
+      <div class="sidebar-label">Recent Chats</div>
+      <div class="chat-history-list">
+        <a href="chat-cached.html" class="chat-history-item">
+          <div class="chat-name">Event Analysis — May 2</div>
+          <div class="chat-preview">What's the status of speaker bios?</div>
+          <div class="chat-time">Yesterday</div>
+        </a>
+        <a href="chat-cached.html" class="chat-history-item">
+          <div class="chat-name">Venue data check</div>
+          <div class="chat-preview">The venue state field shows "England"...</div>
+          <div class="chat-time">2 days ago</div>
+        </a>
+        <a href="chat-cached.html" class="chat-history-item">
+          <div class="chat-name">Speaker bio gaps</div>
+          <div class="chat-preview">List speakers missing bios or photos</div>
+          <div class="chat-time">3 days ago</div>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main-content">
+      <div class="main-inner">
+
+      <!-- Greeting -->
+      <div class="greeting">
+        <div class="greeting-hello">Good morning, Alex.</div>
+        <div class="greeting-context">Here's what needs your attention for this event.</div>
+      </div>
+
+      <!-- Critical warnings -->
+      <div class="critical-banner" style="display:none">
+        <div class="critical-icon">⚠</div>
+        <div class="critical-content">
+          <div class="critical-title">1 Critical Issue Requires Attention</div>
+          <ul class="critical-list">
+            <li>Speaker Jim Roland is missing a bio — 69 speakers listed, 68 complete</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Analyzer summary card — leads to cached chat -->
+      <a href="chat-cached.html" class="analyzer-card">
+        <div class="analyzer-header">
+          <span class="analyzer-label">Event Analyzer</span>
+          <span class="analyzer-action">View full analysis ›</span>
+        </div>
+        <div class="analyzer-title">Overall data quality is strong</div>
+        <div class="analyzer-summary">
+          69 speakers registered with good coverage. One critical gap in speaker bios and minor venue data inconsistency. Timeline is tight — event is 3 days away.
+        </div>
+        <div class="analyzer-stats">
+          <div class="stat-chip">
+            <div class="stat-label">Speakers</div>
+            <div class="stat-value ink">69</div>
+          </div>
+          <div class="stat-chip">
+            <div class="stat-label">Critical</div>
+            <div class="stat-value red">1</div>
+          </div>
+          <div class="stat-chip">
+            <div class="stat-label">Warnings</div>
+            <div class="stat-value amber">4</div>
+          </div>
+          <div class="stat-chip">
+            <div class="stat-label">Days Left</div>
+            <div class="stat-value red">3</div>
+          </div>
+        </div>
+        <div class="analyzer-footer">
+          Open analysis chat ›
+        </div>
+      </a>
+
+      <!-- Prompt input -->
+      <div class="prompt-wrap">
+        <input class="prompt-input" type="text" placeholder="Ask anything about this event…" />
+        <button class="btn-send">↑</button>
+      </div>
+
+      </div>
+    </main>
+
+  </div>
+
+</body>
+</html>

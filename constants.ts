@@ -9,28 +9,55 @@ export const AGENTS: Record<AgentId, {
   accent: string;
   cardBg: string;
 }> = {
-  website:  { name: 'Speaker profiles',     sub: 'Event website',        meta: '1d ago · Draft ready',       accent: '#FDE047', cardBg: '#FFFFFF' },
-  contacts: { name: 'Win warm contacts',    sub: 'Contact & tickets',    meta: '3d ago · 340 warm contacts', accent: '#C4B5FD', cardBg: '#FFFFFF' },
-  insights: { name: 'Registration insight', sub: 'Insights & reporting', meta: '2h ago · 612 registrations', accent: '#34D399', cardBg: '#FFFFFF' },
+  website:  { name: 'Event website · Hero',     sub: 'Event website',        meta: 'Just now · Building',           accent: '#FDE047', cardBg: '#FFFFFF' },
+  contacts: { name: 'Contact & ticket summary', sub: 'Contact & tickets',    meta: '3d ago · 121 contacts',         accent: '#C4B5FD', cardBg: '#FFFFFF' },
+  insights: { name: 'Post-event read-out',      sub: 'Insights & Reporting', meta: '2h ago · 612 registrations',    accent: '#34D399', cardBg: '#FFFFFF' },
+  analyzer: { name: 'Event analyzer',           sub: 'Event analyzer',       meta: 'Just now · 7 findings',         accent: '#F25A38', cardBg: '#FFFFFF' },
 };
 
 // ── Initial messages ───────────────────────────────────────────────────────────
 
 export const INITIAL_MESSAGES: Record<AgentId, ChatMessage[]> = {
   website: [
-    { kind: 'agent', agentId: 'website', text: "Hi Jen, I noticed the event website is missing Dr. Sarah Chen's speaker profile. I've drafted a bio based on the event brief and her published work.", time: '2:14 PM' },
-    { kind: 'agent', agentId: 'website', text: "I've placed her profile in the Speakers section — you can see the draft on the right. Everything is ready to go live. Should I publish it?", time: '2:14 PM' },
-    { kind: 'agent', agentId: 'website', text: '', time: '2:15 PM', actions: [{ label: 'Approve & publish', primary: true, id: 'publish' }, { label: 'Edit first', id: 'edit' }] },
+    { kind: 'agent', agentId: 'website', text: "Hi Jen — I'm your event website builder. Tell me what you'd like to create or change and I'll get straight to work. You can describe a section, a layout, a style direction, or paste a brief.", time: '2:14 PM' },
   ],
   contacts: [
-    { kind: 'agent', agentId: 'contacts', text: "I found 340 contacts who opened the event invite but haven't registered. With the early-bird deadline in 3 days, this is the right moment to follow up.", time: '2:31 PM' },
-    { kind: 'agent', agentId: 'contacts', text: "I've drafted a last-chance email and pulled the contact segment. Both are on the right — let me know if you'd like to adjust the tone or subject line before sending.", time: '2:31 PM' },
-    { kind: 'agent', agentId: 'contacts', text: '', time: '2:32 PM', actions: [{ label: 'Send to 340 contacts', primary: true, id: 'send' }, { label: 'Edit draft', id: 'edit-draft' }] },
+    {
+      kind: 'agent', agentId: 'contacts', time: '9:22 AM',
+      text: "Here's a read-out on your current contact list.\n\n121 contacts total — 104 speakers, 17 RSVPs\nAll have name and email · ~93% have job titles\nMost enrichment fields are empty (country, industry, check-in, leads, engagement)\n\nA few company names look like placeholders — Horizon Dynamics, Nexus Innovations — possibly sample or demo data worth cleaning up.\n\nThree things worth acting on: assign comp tickets to the 104 speakers and 17 RSVPs, follow up with the 5 pending-payment registrants, and send a post-event thank-you to all 708 check-ins.",
+      actions: [
+        { label: 'Assign comp tickets', primary: true, id: 'send' },
+        { label: 'Send thank-you email', id: 'edit-draft' },
+      ],
+    },
+  ],
+  analyzer: [
+    {
+      kind: 'agent', agentId: 'analyzer', time: '8:04 AM',
+      text: "I ran an overnight review of your event — 69 speakers, 3 days to go.\n\n1 critical · 4 warnings · 2 suggestions\n\nSpeakers carry 6 of the 7 items. One item is in Basics. Nothing here blocks the event, but the critical item (Jim Roland's bio) is visible on the public speaker page.",
+    },
+    { kind: 'user', text: 'Analyse the check in for my event', time: '8:05 AM' },
+    {
+      kind: 'agent', agentId: 'analyzer', time: '8:06 AM',
+      text: "Here's the check-in summary for Customer Contact Week Orlando — January 21–22, 2026.\n\nAttendance\n500 checked in · 100% in-person · 0 virtual\nDay 1: 378 (76%) · Day 2: 121 (24%) · Day 3: 1\nSharp Day 2 drop-off — typical for this format.\n\nTicket breakdown\nEnd Users 232 (46%) · Sponsors 206 (41%)\nVendors 29 · Staff 25 · Other 8\nNearly as many sponsors as end users — heavily commercial crowd.\n\nTop companies\nCMP (organizer) 23 · ASAPP 8 · Five9 8 · Replicant 7 · Liveops 7",
+    },
+    { kind: 'user', text: 'Show me the check-in timeline for Day 1', time: '8:07 AM' },
+    {
+      kind: 'agent', agentId: 'analyzer', time: '8:07 AM',
+      text: "Here's the check-in timeline for Day 1. The morning rush peaked at 9:00 AM with 70 check-ins in that 30-minute window — right as the opening keynote was scheduled.",
+    },
+    { kind: 'chart', chartId: 'checkin-day1' },
+    { kind: 'suggestions', pills: ['What items are still open for this event', 'Show me all event registrations', 'Analyse the checkin for my event', 'Change the design of the event website'] },
   ],
   insights: [
-    { kind: 'agent', agentId: 'insights', text: "I've pulled the latest registration data for Tech Summit Europe 2026. You're at 612 participants — 61% of your 1,000-seat target, with 3 days left on early-bird pricing.", time: '3:02 PM' },
-    { kind: 'agent', agentId: 'insights', text: "Registration velocity has been accelerating week over week. With the current pace and the early-bird deadline, I project 720–780 total registrations and €216K–€240K in revenue. Full report is on the right.", time: '3:02 PM' },
-    { kind: 'agent', agentId: 'insights', text: 'Want me to share this report with the team, or draft a summary for the exec update?', time: '3:03 PM', actions: [{ label: 'Share with team', primary: true, id: 'share' }, { label: 'Draft exec summary', id: 'draft' }] },
+    {
+      kind: 'agent', agentId: 'insights', time: '9:14 AM',
+      text: "I've pulled the post-event read-out.\n\n882 tickets sold · 708 checked in — 80% show-up rate\n$461K gross revenue, led by End User and Vendor tickets\n9.5 sessions per attendee · 74% view duration — strong engagement\n\nAudience skewed sponsor and vendor-heavy, tech-industry (Internet Software & Services at 33%), 90%+ US-based. Biggest draws: networking and meals. Top sessions: the Olive Garden keynote, the Voice Agent Build demo, and the Agentic AI airline talk.\n\nDay 1 carried about two-thirds of session traffic — typical Day 2 drop-off. Three follow-ups worth acting on: the 174 no-shows, the low-attendance formats, and the Day 2 gap.",
+      actions: [
+        { label: 'Draft re-engagement email', primary: true, id: 'draft' },
+        { label: 'Analyse Day 2', id: 'day2' },
+      ],
+    },
   ],
 };
 

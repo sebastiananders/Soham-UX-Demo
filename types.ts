@@ -1,4 +1,4 @@
-export type AgentId = 'website' | 'contacts' | 'insights';
+export type AgentId = 'website' | 'contacts' | 'insights' | 'analyzer';
 
 export interface ActionBtn {
   label: string;
@@ -7,11 +7,14 @@ export interface ActionBtn {
 }
 
 export type ChatMessage =
-  | { kind: 'agent'; agentId: AgentId; text: string; time: string; actions?: ActionBtn[] }
+  | { kind: 'agent'; agentId: AgentId; text: string; time: string; actions?: ActionBtn[]; items?: Array<{ title: string; domain: string; color: string }> }
   | { kind: 'user'; text: string; time: string }
 
   | { kind: 'task-running'; label: string }
-  | { kind: 'task-done'; label: string; summary: string };
+  | { kind: 'task-thinking'; steps: string[] }
+  | { kind: 'task-done'; label: string; summary: string }
+  | { kind: 'chart'; chartId: string }
+  | { kind: 'suggestions'; pills: string[] };
 
 export interface HistoryItem {
   id: string;

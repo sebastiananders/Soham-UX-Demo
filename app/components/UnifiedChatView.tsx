@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronLeft, Plus, Mic, Paperclip, Check } from 'lucide-react';
-import { Button } from 'antd';
+import { Plus, Mic, Paperclip, Check } from 'lucide-react';
+import { HeroCanvas } from './HeroCanvas';
 import type { AgentId, ChatMessage } from '../../types';
 import { AGENTS, INITIAL_MESSAGES } from '../../constants';
 import { now } from '../../utils';
@@ -10,6 +10,114 @@ import { ContactsCanvas } from './ContactsCanvas';
 import { InsightsCanvas } from './InsightsCanvas';
 
 
+const FIX_ALL_ITEMS = [
+  { title: 'Jim Roland — missing speaker bio',           domain: 'Speakers', color: '#F25A38' },
+  { title: 'Venue state shows "England"',                domain: 'Basics',   color: '#F2B138' },
+  { title: 'Marita McGinley — non-standard email',       domain: 'Speakers', color: '#F2B138' },
+  { title: 'Dora Seow — email typo "soew"',              domain: 'Speakers', color: '#F2B138' },
+  { title: 'Marita McGinley — name trailing whitespace', domain: 'Speakers', color: '#F2B138' },
+  { title: 'Alex Hideki Sato — unusual name formatting', domain: 'Speakers', color: '#6BA7BF' },
+  { title: 'Verify speaker session assignments',          domain: 'Speakers', color: '#6BA7BF' },
+];
+
+const DAY1_DATA = [
+  { t: '7:00', v: 8 }, { t: '7:30', v: 22 }, { t: '8:00', v: 48 }, { t: '8:30', v: 67 },
+  { t: '9:00', v: 70 }, { t: '9:30', v: 52 }, { t: '10:00', v: 37 }, { t: '10:30', v: 23 },
+  { t: '11:00', v: 15 }, { t: '11:30', v: 11 }, { t: '12:00', v: 7 }, { t: '12:30', v: 6 },
+  { t: '1:00', v: 5 }, { t: '1:30', v: 4 }, { t: '2:00', v: 2 }, { t: '2:30', v: 1 },
+];
+const XLABELS = ['7 AM', '9 AM', '11 AM', '1 PM', '3 PM'];
+const XIDX    = [0, 4, 8, 12, 15];
+
+function CheckinDay1Chart() {
+  const W = 480; const H = 160;
+  const L = 36; const R = 16; const T = 16; const B = 32;
+  const plotW = W - L - R;
+  const plotH = H - T - B;
+  const max = 70;
+  const xs = DAY1_DATA.map((_, i) => L + i * (plotW / (DAY1_DATA.length - 1)));
+  const ys = DAY1_DATA.map(d => T + plotH - (d.v / max) * plotH);
+
+  const curvePath = (fill: boolean) => {
+    const pts = DAY1_DATA.map((_, i) => ({ x: xs[i], y: ys[i] }));
+    let d = `M ${pts[0].x} ${pts[0].y}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const cp = (pts[i + 1].x - (i > 0 ? pts[i - 1].x : pts[i].x)) * 0.2;
+      const cp2 = ((i + 2 < pts.length ? pts[i + 2].x : pts[i + 1].x) - pts[i].x) * 0.2;
+      d += ` C ${pts[i].x + cp} ${pts[i].y}, ${pts[i + 1].x - cp2} ${pts[i + 1].y}, ${pts[i + 1].x} ${pts[i + 1].y}`;
+    }
+    if (fill) d += ` L ${pts[pts.length - 1].x} ${T + plotH} L ${pts[0].x} ${T + plotH} Z`;
+    return d;
+  };
+
+  const peakIdx = 4; // 9:00 AM
+
+  return (
+    <div className="mt-1 overflow-hidden" style={{ borderRadius: '0.85175rem', border: '1px solid rgba(0,0,0,0.08)', backgroundColor: '#fff' }}>
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 pt-4 pb-1">
+        <span style={{ fontSize: 13, fontWeight: 600, color: '#171717' }}>Day 1 check-ins · Jan 21</span>
+        <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.04em', color: '#8A857C', backgroundColor: '#F5F5F5', borderRadius: 4, padding: '2px 7px' }}>378 total</span>
+      </div>
+      {/* Chart */}
+      <svg viewBox={`0 0 ${W} ${H}`} width="100%" height={H} style={{ display: 'block' }}>
+        <defs>
+          <linearGradient id="cig" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#0075de" stopOpacity="0.18" />
+            <stop offset="100%" stopColor="#0075de" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        {/* Y guide lines */}
+        {[0, 35, 70].map(v => {
+          const y = T + plotH - (v / max) * plotH;
+          return (
+            <g key={v}>
+              <line x1={L} y1={y} x2={W - R} y2={y} stroke="rgba(0,0,0,0.06)" strokeWidth="1" />
+              <text x={L - 5} y={y + 3.5} textAnchor="end" fontSize="9" fill="#9CA3AF">{v}</text>
+            </g>
+          );
+        })}
+        {/* Area fill */}
+        <path d={curvePath(true)} fill="url(#cig)" />
+        {/* Line */}
+        <path d={curvePath(false)} fill="none" stroke="#0075de" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        {/* Peak dot */}
+        <circle cx={xs[peakIdx]} cy={ys[peakIdx]} r="4" fill="#0075de" stroke="white" strokeWidth="2" />
+        {/* Peak label */}
+        <text x={xs[peakIdx]} y={ys[peakIdx] - 8} textAnchor="middle" fontSize="10" fontWeight="700" fill="#0075de">70</text>
+        {/* X labels */}
+        {XIDX.map((di, li) => (
+          <text key={li} x={xs[di]} y={H - 6} textAnchor="middle" fontSize="10" fill="#9CA3AF">{XLABELS[li]}</text>
+        ))}
+      </svg>
+    </div>
+  );
+}
+
+function ThinkingMessage({ steps }: { steps: string[] }) {
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => setIdx(i => (i + 1) % steps.length), 1500);
+    return () => clearInterval(interval);
+  }, [steps.length]);
+  return (
+    <div className="flex gap-4 items-center py-2">
+      <BTrace size={32} />
+      <span
+        className="text-sm text-neutral-500"
+        style={{ transition: 'opacity 0.3s ease', opacity: 0.9 }}
+      >
+        {steps[idx]}
+      </span>
+    </div>
+  );
+}
+
+const DOMAIN_TAG: React.CSSProperties = {
+  fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase',
+  color: '#8A857C', backgroundColor: '#F5F5F5', borderRadius: 4, padding: '2px 6px', flexShrink: 0,
+};
+
 export function UnifiedChatView({
   initialAgent,
   onBack,
@@ -18,6 +126,7 @@ export function UnifiedChatView({
   chatBadge,
   chatBadgeColor,
   overrideMessages,
+  autoAction,
   canvasNode,
   onFindingAction,
 }: {
@@ -28,14 +137,20 @@ export function UnifiedChatView({
   chatBadge?: string;
   chatBadgeColor?: string;
   overrideMessages?: ChatMessage[];
+  autoAction?: string;
   canvasNode?: React.ReactNode;
   onFindingAction?: (id: string) => void;
 }) {
   const [messages, setMessages] = useState<ChatMessage[]>(overrideMessages ?? INITIAL_MESSAGES[initialAgent]);
   const [inputValue, setInputValue] = useState('');
-  const [canvasVisible, setCanvasVisible] = useState(!canvasNode);
+  const [canvasVisible, setCanvasVisible] = useState(!canvasNode && initialAgent !== 'website');
 
   const activeAgent = initialAgent;
+
+  const [analyzerAnswered, setAnalyzerAnswered] = useState(false);
+  const [analyzerGraphed, setAnalyzerGraphed] = useState(false);
+  const [websiteBuilt, setWebsiteBuilt] = useState(false);
+  const [heroUpdated, setHeroUpdated] = useState(false);
 
   // Insights-specific state
   const [insightsLoading, setInsightsLoading] = useState(initialAgent === 'insights');
@@ -56,6 +171,13 @@ export function UnifiedChatView({
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  useEffect(() => {
+    if (!autoAction) return;
+    const t = setTimeout(() => handleAction(autoAction), 400);
+    return () => clearTimeout(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const addMessages = (msgs: ChatMessage[]) => {
     setMessages(prev => [...prev, ...msgs]);
@@ -174,17 +296,86 @@ export function UnifiedChatView({
         { kind: 'user', text: 'Copy correct URL', time: t },
         { kind: 'agent', agentId: activeAgent, text: "Copied to clipboard: cdn.bizzabo.com/techsummit-2026/live", time: t },
       ]);
+    } else if (id === 'fix-all') {
+      addMessages([
+        { kind: 'agent', agentId: activeAgent, text: "On it — applying all 7 fixes now.", time: t },
+        { kind: 'task-running', label: 'Applying 7 fixes…' },
+      ]);
+      setTimeout(() => {
+        setMessages(prev => {
+          const next = prev.filter(m => m.kind !== 'task-running');
+          return [
+            ...next,
+            { kind: 'task-done', label: '7 fixes applied', summary: 'All data issues resolved' },
+            { kind: 'agent', agentId: activeAgent, text: "All done. Here's what I fixed:", time: now(), items: FIX_ALL_ITEMS },
+          ];
+        });
+      }, 1800);
     }
   };
+
+  const ANALYZER_RESPONSE = "Here's the check-in summary for Customer Contact Week Orlando — January 21–22, 2026.\n\nAttendance\n500 checked in · 100% in-person · 0 virtual\nDay 1: 378 (76%) · Day 2: 121 (24%) · Day 3: 1\nSharp Day 2 drop-off — typical for this format.\n\nTicket breakdown\nEnd Users 232 (46%) · Sponsors 206 (41%)\nVendors 29 · Staff 25 · Other 8\nNearly as many sponsors as end users — heavily commercial crowd.\n\nRoles\nAttendees 150 · Sponsors 207 · Guests 94 · Speakers 16 · Staff 26\nThe 94 guests suggest a strong invite-a-colleague or promo-code program.\n\nGeography\nUS 370+ · Florida 54 · New York 43 · California 25\nSmall international presence: Canada 10, plus Greece, Japan, Egypt, Germany, UK, Cyprus.\n\nTop companies\nCMP (organizer) 23 · ASAPP 8 · Five9 8 · Replicant 7 · Liveops 7\nGenesys 6 · Disney 5 · The RealReal 5\nContact center tech and BPO firms dominate — on-theme.\n\nIndustry & payment\nIndustry field mostly blank (342/500 N/A) — not reliable for segmentation.\nEnterprise Software 43 · Outsourcing/Offshoring 27 among those who filled it in.\n496 of 500 payments completed · 4 still pending.\n\nWant me to dig deeper? I can break down check-in timing by hour, compare sponsor vs. end-user engagement, or pull a company-by-company attendance list.";
 
   const handleSend = () => {
     const text = inputValue.trim();
     if (!text) return;
     setInputValue('');
     addMessages([{ kind: 'user', text, time: now() }]);
-    setTimeout(() => {
-      addMessages([{ kind: 'agent', agentId: activeAgent, text: "Got it — I'll keep that in mind.", time: now() }]);
-    }, 700);
+    if (activeAgent === 'analyzer' && !analyzerAnswered) {
+      setAnalyzerAnswered(true);
+      addMessages([{ kind: 'task-thinking', steps: ['Reading check-in data…', 'Analyzing attendance patterns…', 'Segmenting by ticket type…', 'Mapping geography…', 'Reviewing company breakdown…', 'Putting it together…'] }]);
+      setTimeout(() => {
+        setMessages(prev => {
+          const next = prev.filter(m => m.kind !== 'task-thinking');
+          return [...next, { kind: 'agent', agentId: activeAgent, text: ANALYZER_RESPONSE, time: now() }];
+        });
+      }, 6000);
+    } else if (activeAgent === 'analyzer' && analyzerAnswered && !analyzerGraphed) {
+      setAnalyzerGraphed(true);
+      addMessages([{ kind: 'task-thinking', steps: ['Loading check-in timestamps…', 'Grouping by 30-minute intervals…', 'Calculating peaks…', 'Rendering chart…'] }]);
+      setTimeout(() => {
+        setMessages(prev => {
+          const next = prev.filter(m => m.kind !== 'task-thinking');
+          return [
+            ...next,
+            { kind: 'agent', agentId: activeAgent, text: "Here's the check-in timeline for Day 1. The morning rush peaked at 9:00 AM with 70 check-ins in that 30-minute window — right as the opening keynote was scheduled.", time: now() },
+            { kind: 'chart', chartId: 'checkin-day1' },
+            { kind: 'suggestions', pills: ['What items are still open for this event', 'Show me all event registrations', 'Analyze the checkin for my event', 'Change the design of the event website'] },
+          ];
+        });
+      }, 4000);
+    } else if (activeAgent === 'website' && !websiteBuilt) {
+      setWebsiteBuilt(true);
+      addMessages([{ kind: 'task-thinking', steps: ['Reading your brief…', 'Planning layout structure…', 'Designing hero section…', 'Adding countdown timer…', 'Placing venue details…', 'Finalising styles…'] }]);
+      setTimeout(() => {
+        setMessages(prev => {
+          const next = prev.filter(m => m.kind !== 'task-thinking');
+          return [
+            ...next,
+            { kind: 'task-done', label: 'Hero section built', summary: 'Split-screen layout · countdown timer · venue block' },
+            { kind: 'agent', agentId: activeAgent, text: "Done — I've built the split-screen hero with your event info and CTA on the left, a live countdown to the event on the right, and the venue block below. Preview is on the right. Let me know if you'd like to tweak anything.", time: now() },
+          ];
+        });
+        setCanvasVisible(true);
+      }, 5500);
+    } else if (activeAgent === 'website' && websiteBuilt) {
+      addMessages([{ kind: 'task-thinking', steps: ['Reading your request…', 'Updating headline…', 'Applying to preview…'] }]);
+      setTimeout(() => {
+        setHeroUpdated(true);
+        setMessages(prev => {
+          const next = prev.filter(m => m.kind !== 'task-thinking');
+          return [
+            ...next,
+            { kind: 'task-done', label: 'Headline updated', summary: 'Marketing Qualified Leads 2026' },
+            { kind: 'agent', agentId: activeAgent, text: 'Done — the headline now reads "Marketing Qualified Leads 2026". Want to adjust anything else?', time: now() },
+          ];
+        });
+      }, 2200);
+    } else {
+      setTimeout(() => {
+        addMessages([{ kind: 'agent', agentId: activeAgent, text: "Got it — I'll keep that in mind.", time: now() }]);
+      }, 700);
+    }
   };
 
   const agentInfo = AGENTS[activeAgent];
@@ -211,7 +402,25 @@ export function UnifiedChatView({
               <span className="text-sm font-semibold text-neutral-900">Soham</span>
               <span className="text-xs text-neutral-400">{msg.time}</span>
             </div>
-            {msg.text && <p className="text-sm text-neutral-700 leading-relaxed">{msg.text}</p>}
+            {msg.text && (
+              <div className="flex flex-col gap-3">
+                {msg.text.split('\n\n').map((para, pi) => (
+                  <p key={pi} className="text-sm text-neutral-700 leading-relaxed whitespace-pre-line">{para}</p>
+                ))}
+              </div>
+            )}
+            {msg.items && (
+              <div className="flex flex-col gap-2.5 mt-1">
+                {msg.items.map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-2.5">
+                    <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                    <span className="text-sm text-neutral-700 flex-1">{item.title}</span>
+                    <span style={DOMAIN_TAG}>{item.domain}</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: '#0075de', flexShrink: 0 }}>✓</span>
+                  </div>
+                ))}
+              </div>
+            )}
             {msg.actions && (
               <div className="flex gap-2 flex-wrap mt-4">
                 {msg.actions.map(a => (
@@ -233,6 +442,31 @@ export function UnifiedChatView({
               </div>
             )}
           </div>
+        </div>
+      );
+    }
+
+    if (msg.kind === 'task-thinking') {
+      return <ThinkingMessage key={i} steps={msg.steps} />;
+    }
+
+    if (msg.kind === 'chart') {
+      return msg.chartId === 'checkin-day1' ? <CheckinDay1Chart key={i} /> : null;
+    }
+
+    if (msg.kind === 'suggestions') {
+      return (
+        <div key={i} className="flex flex-wrap gap-2 pt-1">
+          {msg.pills.map((pill, pi) => (
+            <button
+              key={pi}
+              onClick={() => { setInputValue(pill); setTimeout(() => inputRef.current?.focus(), 0); }}
+              className="px-4 py-2 rounded-full text-sm text-neutral-700 hover:bg-white transition-colors"
+              style={{ backgroundColor: '#F5F5F5', border: '1px solid rgba(0,0,0,0.07)', fontSize: 13 }}
+            >
+              {pill}
+            </button>
+          ))}
         </div>
       );
     }
@@ -272,26 +506,14 @@ export function UnifiedChatView({
     return null;
   };
 
-  return (
-    <div className={`flex h-screen w-full ${!canvasVisible ? 'justify-center' : ''}`}>
-      {/* ── Left: Chat panel ── */}
-      <div className={`${!canvasVisible ? 'w-1/2' : 'w-[400px] shrink-0 border-r border-neutral-100'} flex flex-col`}>
-        <header className="flex items-center gap-3 px-6 py-5 shrink-0 relative transition-colors duration-300"
-          style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid #E5E7EB' }}>
-          <Button
-            type="text"
-            onClick={onBack}
-            icon={<ChevronLeft className="w-5 h-5" />}
-            style={{ width: 34, height: 34, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, color: 'rgba(0,0,0,0.5)', flexShrink: 0 }}
-          />
-          <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-semibold tracking-widest uppercase leading-none px-2 py-1 self-start" style={{ backgroundColor: chatBadgeColor ?? `${AGENTS[activeAgent].accent}80`, color: '#171717', borderRadius: '4px' }}>{chatBadge ?? agentInfo.sub}</span>
-            <h2 className="font-bold text-[18px] leading-tight" style={{ color: '#171717' }}>{chatTitle ?? agentInfo.name}</h2>
-            {!chatTitle && <span className="text-[12px] font-medium" style={{ color: '#9CA3AF' }}>{agentInfo.meta}</span>}
-          </div>
-        </header>
+  const centered = hideCanvas || !canvasVisible;
 
-        <div className="flex-1 overflow-y-auto py-7 px-6 flex flex-col gap-6">
+  return (
+    <div className={`flex h-full w-full ${centered ? 'justify-center' : ''}`}>
+      {/* ── Left: Chat panel ── */}
+      <div className={`${centered ? 'w-1/2' : 'w-[400px] shrink-0 border-r border-neutral-100'} flex flex-col`}>
+
+        <div className="flex-1 overflow-y-auto pt-8 pb-7 px-6 flex flex-col gap-6">
           {messages.map((msg, i) => renderMessage(msg, i))}
           {draftState === 'done' && (
             <div
@@ -332,15 +554,15 @@ export function UnifiedChatView({
               value={inputValue}
               onChange={e => setInputValue(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSend()}
-              placeholder="Ask Soham anything…"
+              placeholder={activeAgent === 'analyzer' && !analyzerAnswered ? 'Analyze the check in for my event' : 'Ask Soham anything…'}
               className="flex-1 bg-transparent border-none outline-none text-[15px] text-neutral-900 placeholder:text-neutral-400"
             />
             <div className="flex items-center gap-2 shrink-0">
               {inputValue && (
                 <button onClick={handleSend}
                   className="w-7 h-7 rounded-full flex items-center justify-center hover:brightness-95 transition-all"
-                  style={{ backgroundColor: AGENTS[activeAgent].accent }}>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+                  style={{ backgroundColor: '#FFF000' }}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#171717" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
                 </button>
               )}
               <Mic className="w-4 h-4 text-neutral-400 cursor-pointer hover:text-neutral-600 transition-colors" />
@@ -363,7 +585,21 @@ export function UnifiedChatView({
         >
           {canvasNode ?? (
             <>
-              {activeAgent === 'website' && <WebsiteCanvas />}
+              {activeAgent === 'website' && (websiteBuilt ? (
+                <HeroCanvas
+                  showUpdated={heroUpdated}
+                  onDescribeChange={zone => {
+                    setInputValue(`Change the ${zone}: `);
+                    setTimeout(() => inputRef.current?.focus(), 50);
+                  }}
+                  onApply={(zoneId, values) => {
+                    if (zoneId === 'headline') {
+                      setHeroUpdated(true);
+                      addMessages([{ kind: 'agent', agentId: activeAgent, text: `Done — the headline has been updated to "${values[0]}". You can see the change in the preview.`, time: now() }]);
+                    }
+                  }}
+                />
+              ) : <WebsiteCanvas />)}
               {activeAgent === 'contacts' && <ContactsCanvas />}
               {activeAgent === 'insights' && (
                 <InsightsCanvas

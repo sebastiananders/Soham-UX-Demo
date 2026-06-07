@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>New Chat — Soham</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #0066cc;
+      --primary-focus: #0071e3;
+      --primary-on-dark: #2997ff;
+      --ink: #1d1d1f;
+      --ink-muted-80: #333333;
+      --ink-muted-48: #7a7a7a;
+      --divider-soft: #f0f0f0;
+      --hairline: #e0e0e0;
+      --canvas: #ffffff;
+      --canvas-parchment: #f5f5f7;
+      --surface-pearl: #fafafc;
+      --surface-tile-1: #272729;
+      --surface-black: #000000;
+      --surface-chip: #d2d2d7;
+      --on-primary: #ffffff;
+      --on-dark: #ffffff;
+      --status-critical: #ff3b30;
+      --status-warning: #ff9500;
+      --status-clean: #34c759;
+      --status-past: #8e8e93;
+    }
+
+    body {
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      background: var(--canvas-parchment);
+      color: var(--ink);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Global nav */
+    .global-nav {
+      background: #000000;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      padding: 0 32px;
+      gap: 24px;
+      flex-shrink: 0;
+    }
+    .global-nav .logo {
+      font-family: "SF Pro Display", system-ui, -apple-system, sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      color: #ffffff;
+      text-decoration: none;
+    }
+    .global-nav .back-link {
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      font-size: 12px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.72);
+      text-decoration: none;
+      letter-spacing: -0.12px;
+      line-height: 1.0;
+      transition: color 0.15s;
+    }
+    .global-nav .back-link:hover { color: #ffffff; }
+
+    /* Sub nav — frosted */
+    .sub-nav {
+      background: rgba(245,245,247,0.88);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      height: 52px;
+      display: flex;
+      align-items: center;
+      padding: 0 32px;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      flex-shrink: 0;
+      position: relative;
+    }
+    .sub-nav-center {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      pointer-events: none;
+    }
+    .sub-nav .event-title {
+      font-family: "SF Pro Display", system-ui, -apple-system, sans-serif;
+      font-size: 21px;
+      font-weight: 600;
+      line-height: 1.19;
+      letter-spacing: 0.231px;
+      color: var(--ink);
+    }
+    .sub-nav .event-date {
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ink-muted-48);
+      letter-spacing: -0.12px;
+    }
+
+    /* button-dark-utility */
+    .sub-nav .btn-new-chat {
+      background: #1d1d1f;
+      color: #ffffff;
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      letter-spacing: -0.224px;
+      line-height: 1.29;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 15px;
+      cursor: pointer;
+      text-decoration: none;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      transition: background 0.15s;
+    }
+    .sub-nav .btn-new-chat:hover { background: #000000; }
+    .sub-nav .btn-new-chat:active { transform: scale(0.95); }
+
+    /* Body layout */
+    .body-layout {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 240px;
+      flex-shrink: 0;
+      background: var(--canvas);
+      border-right: 1px solid var(--hairline);
+      display: flex;
+      flex-direction: column;
+      padding: 24px 16px;
+      overflow-y: auto;
+    }
+    .sidebar-label {
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink-muted-48);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      padding-left: 4px;
+    }
+    .chat-history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .chat-history-item {
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      text-decoration: none;
+      color: inherit;
+      transition: background 0.15s;
+    }
+    .chat-history-item:hover { background: var(--canvas-parchment); }
+    .chat-history-item.active { background: var(--canvas-parchment); }
+    .chat-name {
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: -0.12px;
+      color: var(--ink);
+    }
+    .chat-preview {
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ink-muted-48);
+      letter-spacing: -0.08px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .chat-time {
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      font-size: 11px;
+      color: var(--ink-muted-48);
+      margin-top: 1px;
+    }
+
+    /* Main area — centered */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 32px;
+      gap: 40px;
+    }
+
+    /* Center block */
+    .center-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      width: 100%;
+      max-width: 580px;
+    }
+
+    /* Empty state icon */
+    .empty-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: var(--surface-tile-1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    .empty-headline {
+      font-family: "SF Pro Display", system-ui, -apple-system, sans-serif;
+      font-size: 28px;
+      font-weight: 400;
+      line-height: 1.14;
+      letter-spacing: 0.196px;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+    .empty-sub {
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      font-size: 17px;
+      font-weight: 400;
+      line-height: 1.47;
+      letter-spacing: -0.374px;
+      color: var(--ink-muted-48);
+      margin-bottom: 32px;
+    }
+
+    /* Prompt wrap — inline, no frosted, no shadow */
+    .prompt-wrap {
+      width: 100%;
+      max-width: 580px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--canvas);
+      border: 1px solid var(--hairline);
+      border-radius: 18px;
+      padding: 14px 16px;
+      transition: border-color 0.15s;
+    }
+    .prompt-wrap:focus-within { border-color: var(--primary-focus); }
+
+    .prompt-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      height: 44px;
+      padding: 0 8px;
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      font-size: 17px;
+      font-weight: 400;
+      line-height: 1.47;
+      letter-spacing: -0.374px;
+      color: var(--ink);
+      outline: none;
+    }
+    .prompt-input::placeholder { color: var(--ink-muted-48); }
+
+    .btn-send {
+      background: #1d1d1f;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      width: 36px;
+      height: 36px;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .btn-send:hover { background: #000000; }
+    .btn-send:active { transform: scale(0.95); }
+
+    /* Suggestion chips — configurator-option-chip style */
+    .suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      max-width: 580px;
+    }
+    .suggestion-chip {
+      background: var(--canvas);
+      border: 1px solid var(--hairline);
+      border-radius: 9999px;
+      padding: 8px 18px;
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.43;
+      letter-spacing: -0.224px;
+      color: var(--ink-muted-80);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: border-color 0.15s;
+    }
+    .suggestion-chip:hover { border-color: #c0c0c5; }
+    .suggestion-chip:active { transform: scale(0.98); }
+  </style>
+</head>
+<body>
+
+  <!-- Global nav -->
+  <header class="global-nav">
+    <a href="index.html" class="logo">Soham</a>
+    <a href="event.html" class="back-link">‹ Asset Management Asia Forum</a>
+  </header>
+
+  <!-- Sub nav — frosted -->
+  <div class="sub-nav">
+    <a href="chat-new.html" class="btn-new-chat">+ New Chat</a>
+    <div class="sub-nav-center">
+      <span class="event-title">Asset Management Asia Forum</span>
+      <span class="event-date">May 6, 2026 · Singapore</span>
+    </div>
+  </div>
+
+  <div class="body-layout">
+
+    <!-- Sidebar: recent chats -->
+    <aside class="sidebar">
+      <div class="sidebar-label">Recent Chats</div>
+      <div class="chat-history-list">
+        <a href="chat-cached.html" class="chat-history-item">
+          <div class="chat-name">Event Analysis — May 2</div>
+          <div class="chat-preview">What's the status of speaker bios?</div>
+          <div class="chat-time">Yesterday</div>
+        </a>
+        <a href="chat-cached.html" class="chat-history-item">
+          <div class="chat-name">Venue data check</div>
+          <div class="chat-preview">The venue state field shows "England"...</div>
+          <div class="chat-time">2 days ago</div>
+        </a>
+        <a href="chat-cached.html" class="chat-history-item">
+          <div class="chat-name">Speaker bio gaps</div>
+          <div class="chat-preview">List speakers missing bios or photos</div>
+          <div class="chat-time">3 days ago</div>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main: prompt-focused -->
+    <main class="main">
+      <div class="center-block">
+        <div class="empty-icon">✦</div>
+        <div class="empty-headline">New conversation</div>
+        <div class="empty-sub">Ask anything about Asset Management Asia Forum — speakers, venue, data quality, timelines, or anything else.</div>
+      </div>
+
+      <!-- Prompt — hero -->
+      <div class="prompt-wrap">
+        <input class="prompt-input" type="text" placeholder="Ask anything about this event…" autofocus />
+        <button class="btn-send">↑</button>
+      </div>
+
+      <!-- Suggestions -->
+      <div class="suggestions">
+        <button class="suggestion-chip">Summarize speaker data quality</button>
+        <button class="suggestion-chip">Show all critical issues</button>
+        <button class="suggestion-chip">Check venue information</button>
+        <button class="suggestion-chip">Identify invalid emails</button>
+        <button class="suggestion-chip">What needs doing in 3 days?</button>
+        <button class="suggestion-chip">Draft a speaker reminder email</button>
+      </div>
+    </main>
+
+  </div>
+
+</body>
+</html>
